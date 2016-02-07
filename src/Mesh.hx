@@ -14,66 +14,27 @@ typedef Attrib =
 
 class Mesh
 {
-	static var meshes: Array<Mesh> = new Array();
-	public static function restoreAll(): Void
-	{
-		for (mesh in meshes)
-		{
-			mesh.restore();
-		}
-	}
-	
-	var vertexBuffer: GLBuffer;
-	var indexBuffer: GLBuffer;
-	
 	var vertexArr: Float32Array;
 	var indexArr: Int16Array;
 	
 	var BYTES_PER_ELEMENT: Int = Float32Array.BYTES_PER_ELEMENT;
-
-	var _vertices: Array <Float>;
-	var _indices: Array<Int>;
 	
-	var _attribs: Array<Attrib>;
-	var _attribSize: Int;
+	var attribs: Array<Attrib>;
+	var attribSize: Int;
 	
 	public function new(vertices: Array<Float>, indices: Array<Int>) 
 	{		
-		_vertices = vertices;
-		_indices = indices;
+		attribs = new Array();
+		attribSize = 0;
 		
-		_attribs = new Array();
-		_attribSize = 0;
-		
-		restore();
-		
-		meshes.push(this);
-	}
-
-	public function restore(): Void
-	{
-		vertexBuffer = GL.createBuffer();
-		indexBuffer = GL.createBuffer();
-		
-		vertexArr = new Float32Array(_vertices);
-		indexArr = new Int16Array(_indices);
-		
-		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		GL.bufferData(GL.ARRAY_BUFFER, vertexArr, GL.STATIC_DRAW);
-		GL.bindBuffer(GL.ARRAY_BUFFER, null);
-		
-		if (_indices.length > 0)
-		{
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-			GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indexArr, GL.STATIC_DRAW);
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
-		}
+		vertexArr = new Float32Array(vertices);
+		indexArr = new Int16Array(indices);
 	}
 	
 	public function addAttrib(name: String, size: Int): Void
 	{
-		_attribs.push( { loc: -1, name: name, size: size } );
-		_attribSize += size;
+		attribs.push( { loc: -1, name: name, size: size } );
+		attribSize += size;
 	}
 	
 	public function bind(shader: ShaderProgram): Void

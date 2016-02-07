@@ -18,7 +18,6 @@ class Renderer
 	public function uploadMesh(mesh: Mesh): Void
 	{
 		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		
 	}
 	
 	public function renderMesh(transform: Mat4 = null): Void
