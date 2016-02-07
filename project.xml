@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+
+	<meta title="OurDarkLord" package="OurDarkLord" version="1.0.0" company="Anheurystics" />
+
+	<app main="Main" file="OurDarkLord" path="bin" />
+	
+	<window background="#000000" fps="60" />
+	<window width="800" height="600" unless="mobile" />
+	<window orientation="landscape" vsync="false" if="cpp" />
+	
+	<set name="webgl" if="html5" />
+	<haxedef name="webgl" if="html5" />
+	
+	<source path="src" />
+	<haxelib name="openfl" />
+
+	<icon path="assets/cultist_icon.png" />
+	<assets path="assets/graphics" rename="graphics" embed="true"/>
+	<assets path="assets/fonts" rename="fonts" embed="true"/>
+	<assets path="assets/shaders" rename="shaders"embed="true" />
+	
+</project>
