@@ -44,8 +44,18 @@ class ShaderProgram
 		uniformLocations = new Map();
 		attribLocations = new Map();
 		
-		var vertSrc = #if !html5 "#version 120\n" + #end Assets.getText("shaders/" + vertName + ".vert");
-		var fragSrc = #if !html5 "#version 120\n" + #end Assets.getText("shaders/" + fragName + #if html5 "_web" + #end ".frag");
+		var vertSrc = Assets.getText("shaders/" + vertName + ".vert");
+		var fragSrc = Assets.getText("shaders/" + fragName + ".frag");
+		
+		#if !html5
+		vertSrc = "#version 120\n" + vertSrc;
+		fragSrc = "#version 120\n" + fragSrc;
+		#else
+		fragSrc = "precision mediump float;" + fragSrc;
+		
+		vertSrc = StringTools.replace(vertSrc, "bgra", "rgba");
+		fragSrc = StringTools.replace(fragSrc, "bgra", "rgba");
+		#end
 		
 		program = GL.createProgram();
 		
