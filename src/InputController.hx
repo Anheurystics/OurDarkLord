@@ -45,7 +45,10 @@ class InputController implements PlayerController
 		
 		if (Input.isDown(gamepad + "run") && player.stamina > 0)
 		{
-			player.stamina -= 1.0;
+			if(player._movement.length > 0)
+			{
+				player.stamina -= 1.0;
+			}
 			player.runMultiplier = 1.5;
 		}
 		
@@ -62,7 +65,7 @@ class InputController implements PlayerController
 					{
 						var toRelic: Vector3D = new Vector3D(player.x - relic.x, 0, player.z - relic.z);
 						var dist: Float = toRelic.normalize();
-						if (dist < 1 && dist < nearest)
+						if (dist < player.pickupRange && dist < nearest)
 						{
 							var dot: Float = front.dotProduct(toRelic);
 							if (dot < -0.85) 
@@ -88,7 +91,7 @@ class InputController implements PlayerController
 							var playerFront: Vector3D = new Vector3D(Math.cos(Utils.toRad(other.lookAngle)), 0, Math.sin(Utils.toRad(other.lookAngle)));
 							var toPlayer: Vector3D = new Vector3D(player.x - other.x, 0, player.z - other.z);
 							var dist: Float = toPlayer.normalize();
-							if (dist < 1 && dist < nearest)
+							if (dist < player.pickupRange && dist < nearest)
 							{
 								var dot: Float = front.dotProduct(playerFront);
 								if (dot < -0.85)

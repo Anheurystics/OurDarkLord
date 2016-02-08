@@ -37,6 +37,6 @@ class Main extends Sprite
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, KeyboardInput.keyCallback);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyboardInput.keyCallback);		
 		
-		addChild(new Menu());
+		addChild(new GLMenu());
 	}
 }

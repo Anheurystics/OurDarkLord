@@ -3,10 +3,11 @@ package;
 import openfl.geom.Vector3D;
 
 class Player extends Entity
-{		
-	public var fov: Float = 60;
+{
+	public var fov: Float = 55;
 	public var movespeed: Float = 2.5; 
 	public var lookspeed: Float = 100;
+	public var pickupRange: Float = 1.25;
 	public var camera: Camera;
 	
 	public var _movement: Vector3D = new Vector3D();
@@ -111,8 +112,8 @@ class Player extends Entity
 		camera.update();
 		
 		sprite.x = x;
-		sprite.angleOffset = lookAngle;
 		sprite.z = z;
+		sprite.angleOffset = lookAngle;
 	}
 	
 	public function pickupRelic(relic: Relic): Void

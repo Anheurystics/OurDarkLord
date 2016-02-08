@@ -257,14 +257,14 @@ class Game extends OpenGLView
 		renderer.viewport(x, Lib.current.stage.stageHeight - y - h, w, h);
 		
 		Camera.current = player.camera;
+		player.camera.updateProjection(w / h);
 		
-		var proj: Mat4 = new Mat4().perspective(player.fov, w / h, 0.1, 100.0);
 		var ortho: Mat4 = new Mat4().ortho(0, w, h, 0, 0.1, 100.0);
 		
 		renderer.uploadProgram(skyboxProgram);
 		
 		renderer.uniformMatrix("view", player.camera.getView());
-		renderer.uniformMatrix("proj", proj);
+		renderer.uniformMatrix("proj", player.camera.getProjection());
 		
 		desertMap.bindTex();
 		renderer.uploadMesh(skyboxMesh);
@@ -274,7 +274,7 @@ class Game extends OpenGLView
 		renderer.uploadProgram(simpleProgram);
 		
 		renderer.uniformMatrix("view", player.camera.getView());
-		renderer.uniformMatrix("proj", proj);
+		renderer.uniformMatrix("proj", player.camera.getProjection());
 		renderer.uniformf("cameraPos", player.x, 0, player.z);
 		
 		renderer.uploadMesh(quadMesh);

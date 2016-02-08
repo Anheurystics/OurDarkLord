@@ -1,5 +1,6 @@
 package;
 import haxe.ds.Vector;
+import openfl.Lib;
 import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
 import openfl.utils.Float32Array;
@@ -17,6 +18,8 @@ class Camera
 	public var pitch: Float;
 	
 	var _view: Mat4;
+	var _projection: Mat4;
+	var _fov: Float = 74;
 	
 	public function new(position: Vector3D = null, up: Vector3D = null, yaw = 0, pitch = 0)
 	{
@@ -30,6 +33,7 @@ class Camera
 		this.pitch = pitch;
 		
 		_view = new Mat4();
+		_projection = new Mat4().perspective(_fov, Lib.current.stage.stageWidth / Lib.current.stage.stageHeight, 0.1, 100.0);
 	}
 	
 	public function setToPlayer(player: Player): Void
@@ -37,7 +41,8 @@ class Camera
 		position.x = player.x;
 		position.y = 0.25;
 		position.z = player.z;
-		yaw = player.lookAngle;		
+		yaw = player.lookAngle;
+		_fov = player.fov;
 	}
 	
 	public function update(): Void
@@ -57,6 +62,18 @@ class Camera
 		
 		up = right.crossProduct(front);
 		up.normalize();
+		
+		_projection = new Mat4().perspective(_fov, Lib.current.stage.stageWidth / Lib.current.stage.stageHeight, 0.1, 100.0);
+	}
+	
+	public function updateProjection(aspect: Float): Void
+	{
+		_projection.perspective(_fov, aspect, 0.1, 100.0);
+	}
+	
+	public function getProjection(): Mat4
+	{
+		return _projection;
 	}
 	
 	public function getView(): Mat4
