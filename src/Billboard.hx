@@ -168,7 +168,7 @@ class Billboard
 			{
 				renderer.uniformf("flipX", 1);
 				renderer.uniformf("offset", 0, 0);
-				renderer.uniformf("tile", 1 / 1);
+				renderer.uniformf("tile", 1, 1);
 			}
 		}
 		else
