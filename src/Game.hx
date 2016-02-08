@@ -11,6 +11,8 @@ import openfl.utils.Float32Array;
 
 class Game extends OpenGLView
 {	
+	var renderer: Renderer;
+	
 	var shaderProgram: ShaderProgram;
 	var skyboxProgram: ShaderProgram;
 	var overlayProgram: ShaderProgram;
@@ -215,11 +217,11 @@ class Game extends OpenGLView
 		GL.depthFunc(GL.LEQUAL);
 		GL.depthMask(true);			
 		
+		renderer = new Renderer();
+		
 		shaderProgram = new ShaderProgram("shader", "shader");
 		skyboxProgram = new ShaderProgram("skybox", "skybox");
 		overlayProgram = new ShaderProgram("overlay", "overlay");
-		
-		shaderProgram.bind();
 		
 		TextureManager.load("cobble", "graphics/cobble.png");
 		
@@ -241,13 +243,17 @@ class Game extends OpenGLView
 		TextureManager.load("summon",			"graphics/summon.png");
 		desertMap.load();
 		
-		quadMesh = new Mesh(quad, quadIndices);
-		quadMesh.addAttrib("position", 3);
-		quadMesh.addAttrib("texCoord", 2);
-		quadMesh.addAttrib("normal", 3);
+		quadMesh = new Mesh(quad, quadIndices, "quad");
 		
-		skyboxMesh = new Mesh(skyboxVertices, []);
-		skyboxMesh.addAttrib("position", 3);
+		renderer.setAttribLayout("quad");
+		renderer.addAttrib("position", 3);
+		renderer.addAttrib("texCoord", 2);
+		renderer.addAttrib("normal", 3);
+		
+		skyboxMesh = new Mesh(skyboxVertices, [], "skybox");
+		
+		renderer.setAttribLayout("skybox");
+		renderer.addAttrib("position", 3);
 		
 		model = new Mat4();
 		
@@ -304,10 +310,6 @@ class Game extends OpenGLView
 		GL.enable(GL.DEPTH_TEST);
 		GL.depthFunc(GL.LEQUAL);
 		
-		#if desktop
-		GL.enable(GL.TEXTURE_2D);
-		#end
-		
 		GL.viewport(0, 0, Std.int(rect.width), Std.int(rect.height));
 		
 		GL.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -316,7 +318,7 @@ class Game extends OpenGLView
 		
 		GL.clear(GL.DEPTH_BUFFER_BIT | GL.COLOR_BUFFER_BIT);
 		
-		shaderProgram.bind();
+		renderer.uploadProgram(shaderProgram);
 		
 		GL.uniform1i(shaderProgram.uniform("tex1"), 0);
 		GL.uniform1i(shaderProgram.uniform("useFog"), 0);
@@ -336,8 +338,6 @@ class Game extends OpenGLView
 			GL.viewport(0, 0, w, h);
 		}
 		
-		shaderProgram.unbind();	
-		
 		overlay.update(delta, gameInfo);
 	}
 	
@@ -351,35 +351,33 @@ class Game extends OpenGLView
 		var ortho: Mat4 = new Mat4().ortho(0, w, h, 0, 0.1, 100.0);
 		
 		GL.depthMask(false);
-		skyboxProgram.bind();
+		renderer.uploadProgram(skyboxProgram);
 		
 		//TODO lessen uniform matrix allocation
 		GL.uniformMatrix4fv(skyboxProgram.uniform("view"), false, player.camera.getView());
 		GL.uniformMatrix4fv(skyboxProgram.uniform("proj"), false, proj.array());	
-		GL.uniformMatrix4fv(skyboxProgram.uniform("model"), false, skyboxMatrix.array());
 		
 		desertMap.bindTex();
-		skyboxMesh.bind(skyboxProgram);
-		skyboxMesh.render(skyboxProgram);
+		renderer.uploadMesh(skyboxMesh);
+		renderer.renderMesh(skyboxMatrix);
 		desertMap.unbindTex();
-		skyboxProgram.unbind();
 		
 		GL.depthMask(true);
-		shaderProgram.bind();
+		renderer.uploadProgram(shaderProgram);
 		
 		GL.uniformMatrix4fv(shaderProgram.uniform("view"), false, player.camera.getView());
 		GL.uniformMatrix4fv(shaderProgram.uniform("proj"), false, proj.array());	
 		GL.uniform3f(shaderProgram.uniform("cameraPos"), player.x, 0, player.z);
 		
-		quadMesh.bind(shaderProgram);
+		renderer.uploadMesh(quadMesh);
 		
 		GL.uniform2f(shaderProgram.uniform("tile"), planeWidth, planeLength);
 		TextureManager.get("cobble").bind(shaderProgram, GL.TEXTURE0);
-		quadMesh.render(shaderProgram, floorMatrix);
+		renderer.renderMesh(floorMatrix);
 		
 		GL.uniform2f(shaderProgram.uniform("tile"), 1, 1);
 		TextureManager.get("circle_1").bind(shaderProgram, GL.TEXTURE0);
-		quadMesh.render(shaderProgram, circleMatrix);
+		renderer.renderMesh(circleMatrix);
 		
 		for (p in players)
 		{
@@ -387,7 +385,7 @@ class Game extends OpenGLView
 			{
 				TextureManager.get("cultist_sheet").bind(shaderProgram, GL.TEXTURE0);
 				p.sprite.bind(shaderProgram);
-				quadMesh.render(shaderProgram);
+				renderer.renderMesh();
 			}
 		}
 		
@@ -428,11 +426,11 @@ class Game extends OpenGLView
 				}
 			}
 			
-			quadMesh.render(shaderProgram, relicTransform);
+			renderer.renderMesh(relicTransform);
 			TextureManager.get(relic.type).unbind(shaderProgram);
 		}
 		
-		overlayProgram.bind();		
+		renderer.uploadProgram(overlayProgram);	
 		GL.uniform1f(overlayProgram.uniform("alpha"), 1.0);
 		GL.uniform3fv(overlayProgram.uniform("tint"), colorWhite);
 		GL.uniformMatrix4fv(overlayProgram.uniform("view"), false, orthoView.array());
@@ -450,7 +448,7 @@ class Game extends OpenGLView
 			}
 			GL.uniform1f(overlayProgram.uniform("alpha"), onCircle ? 1.0: .25);
 			TextureManager.get(player.goalRelics[i]).bind(overlayProgram, GL.TEXTURE0);
-			quadMesh.render(overlayProgram, mat);
+			renderer.renderMesh(mat);
 			
 			mat.translate(50, 0, 0);
 		}
@@ -466,7 +464,7 @@ class Game extends OpenGLView
 				
 				GL.uniform3fv(overlayProgram.uniform("tint"), colorRed);
 				TextureManager.get(relicType).bind(overlayProgram, GL.TEXTURE0);
-				quadMesh.render(overlayProgram, mat);
+				renderer.renderMesh(mat);
 				
 				mat.translate(50, 0, 0);
 			}
@@ -477,19 +475,15 @@ class Game extends OpenGLView
 		
 		TextureManager.get("stamina").bind(overlayProgram, GL.TEXTURE0);
 		mat.identity().scale(2 * player.stamina, 30, 1).translate(player.stamina + 70, 100, 0);
-		quadMesh.render(overlayProgram, mat);
+		renderer.renderMesh(mat);
 		
 		TextureManager.get("summon").bind(overlayProgram, GL.TEXTURE0);
 		mat.identity().scale(20 * player.summonLength, 30, 1).translate((player.summonLength * 10) + 30, 150, 0);
-		quadMesh.render(overlayProgram, mat);
+		renderer.renderMesh(mat);
 		
 		TextureManager.get("circle_1").bind(shaderProgram, GL.TEXTURE0);	
 		mat.identity().scale(40, 40, 1).translate(25, 150, 0);
-		quadMesh.render(overlayProgram, mat);
-		
-		quadMesh.unbind();
-		
-		overlayProgram.unbind();
+		renderer.renderMesh(mat);
 	}
 	
 	function updateScene(delta: Float)
