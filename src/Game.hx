@@ -3,6 +3,7 @@ package;
 import openfl.Lib;
 import openfl.display.OpenGLView;
 import openfl.events.Event;
+import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.geom.Vector3D;
 import openfl.gl.GL;
@@ -196,7 +197,7 @@ class Game extends OpenGLView
 		planeLength = Std.int(gameInfo.bounds + 5);
 		
 		ceilMatrix = new Mat4().rotate(90, Vector3D.X_AXIS).scale(planeWidth, 1.0, planeLength).translate(0.0, 0.5, 0.0);
-		floorMatrix = new Mat4().rotate(-90, Vector3D.X_AXIS).scale(planeWidth, 1.0, planeLength).translate(-0.5, -0.5, -0.5);		
+		floorMatrix = new Mat4().rotate(-90, Vector3D.X_AXIS).scale(planeWidth, 1.0, planeLength).translate(0, -0.5, 0);		
 		circleMatrix = new Mat4().rotate(-90, Vector3D.X_AXIS).scale(circle.scale, 1.0, circle.scale).translate(0, -0.49, 0);
 		
 		skyboxMatrix = new Mat4().scale(desertMap.skyboxFinalSize, desertMap.skyboxFinalSize, desertMap.skyboxFinalSize);
@@ -242,17 +243,8 @@ class Game extends OpenGLView
 		TextureManager.load("summon",			"graphics/summon.png");
 		desertMap.load();
 		
-		quadMesh = new Mesh(quad, quadIndices, "quad");
-		
-		renderer.setAttribLayout("quad");
-		renderer.addAttrib("position", 3);
-		renderer.addAttrib("texCoord", 2);
-		renderer.addAttrib("normal", 3);
-		
-		skyboxMesh = new Mesh(skyboxVertices, [], "skybox");
-		
-		renderer.setAttribLayout("skybox");
-		renderer.addAttrib("position", 3);
+		quadMesh = new Mesh(quad, quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
+		skyboxMesh = new Mesh(skyboxVertices, [], ["position"], [3]);
 		
 		model = new Mat4();
 		
@@ -266,38 +258,20 @@ class Game extends OpenGLView
 		
 		for (relic in relicList)
 		{
-			relics.set(relic, new Relic(Std.random(gameInfo.bounds) - (gameInfo.bounds / 2), Std.random(gameInfo.bounds) - (gameInfo.bounds / 2), relic));
+			var spawnX: Float;
+			var spawnY: Float;
+			do
+			{
+				spawnX = Std.random(gameInfo.bounds) - (gameInfo.bounds / 2);
+				spawnY = Std.random(gameInfo.bounds) - (gameInfo.bounds / 2);
+			}
+			while (Utils.dist(spawnX, spawnY, gameInfo.bounds / 2, gameInfo.bounds / 2) < circle.scale / 2);
+			
+			relics.set(relic, new Relic(spawnX, spawnY, relic));
 		}	
 		
 		gameInfo.players = players;
 	}
-
-	#if mobile
-	var needsRestoreContext: Bool = false;
-	function contextHandler(e: Event)
-	{
-		if (e.type == OpenGLView.CONTEXT_LOST)
-		{
-			needsRestoreContext = true;
-		}
-		else
-		if (e.type == OpenGLView.CONTEXT_RESTORED)
-		{
-			if (needsRestoreContext)
-			{
-				needsRestoreContext = false;
-				
-				GL.enable(GL.DEPTH_TEST);
-				GL.depthFunc(GL.LEQUAL);
-				GL.depthMask(true);
-				
-				ShaderProgram.restoreAll();
-				Texture.restoreAll();
-				Mesh.restoreAll();
-			}
-		}
-	}
-	#end
 	
 	function glRender(rect: Rectangle): Void
 	{		
@@ -329,6 +303,7 @@ class Game extends OpenGLView
 		var w: Int = Std.int(rect.width);
 		var h: Int = Std.int(rect.height);
 		gameInfo.viewports = viewportLayout;
+		
 		//TODO turn renderPlayerPOV method into renderPOV in player
 		for (i in 0...players.length)
 		{
