@@ -363,7 +363,6 @@ class Game extends OpenGLView
 		GL.depthMask(true);
 		renderer.uploadProgram(shaderProgram);
 		
-		trace("mark");
 		renderer.uniformMatrix("view", player.camera.getView());
 		renderer.uniformMatrix("proj", proj);
 		renderer.uniformf("cameraPos", player.x, 0, player.z);
