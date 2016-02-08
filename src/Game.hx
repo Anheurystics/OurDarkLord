@@ -14,7 +14,7 @@ class Game extends OpenGLView
 {	
 	var renderer: Renderer;
 	
-	var shaderProgram: ShaderProgram;
+	var simpleProgram: ShaderProgram;
 	var skyboxProgram: ShaderProgram;
 	var overlayProgram: ShaderProgram;
 	
@@ -219,7 +219,7 @@ class Game extends OpenGLView
 		
 		renderer = new Renderer();
 		
-		shaderProgram = new ShaderProgram("shader", "shader");
+		simpleProgram = new ShaderProgram("simple", "simple");
 		skyboxProgram = new ShaderProgram("skybox", "skybox");
 		overlayProgram = new ShaderProgram("overlay", "overlay");
 		
@@ -291,7 +291,7 @@ class Game extends OpenGLView
 		
 		GL.clear(GL.DEPTH_BUFFER_BIT | GL.COLOR_BUFFER_BIT);
 		
-		renderer.uploadProgram(shaderProgram);
+		renderer.uploadProgram(simpleProgram);
 		
 		renderer.uniformi("tex1", 0);
 		renderer.uniformi("useFog", 0);
@@ -336,7 +336,7 @@ class Game extends OpenGLView
 		desertMap.unbindTex();
 		
 		GL.depthMask(true);
-		renderer.uploadProgram(shaderProgram);
+		renderer.uploadProgram(simpleProgram);
 		
 		renderer.uniformMatrix("view", player.camera.getView());
 		renderer.uniformMatrix("proj", proj);
