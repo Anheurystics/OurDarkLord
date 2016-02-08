@@ -19,64 +19,8 @@ class Game extends OpenGLView
 	var overlayProgram: ShaderProgram;
 	
 	var model: Mat4;
-
 	var orthoView: Mat4;
-	
-	var quad: Array<Float> = [
-		-0.5,  0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-		 0.5,  0.5, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
-		 0.5, -0.5, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-		-0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0
-	];
-	
-	var quadIndices: Array<Int> = [
-		0, 1, 2, 0, 2, 3
-	];
-	
-	var skyboxVertices: Array<Float> = [         
-		-1.0,  1.0, -1.0,
-		-1.0, -1.0, -1.0,
-		 1.0, -1.0, -1.0,
-		 1.0, -1.0, -1.0,
-		 1.0,  1.0, -1.0,
-		-1.0,  1.0, -1.0,
-		
-		-1.0, -1.0,  1.0,
-		-1.0, -1.0, -1.0,
-		-1.0,  1.0, -1.0,
-		-1.0,  1.0, -1.0,
-		-1.0,  1.0,  1.0,
-		-1.0, -1.0,  1.0,
-		
-		 1.0, -1.0, -1.0,
-		 1.0, -1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		 1.0,  1.0, -1.0,
-		 1.0, -1.0, -1.0,
 
-		-1.0, -1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		 1.0, -1.0,  1.0,
-		-1.0, -1.0,  1.0,
-
-		-1.0,  1.0, -1.0,
-		 1.0,  1.0, -1.0,
-		 1.0,  1.0,  1.0,
-		 1.0,  1.0,  1.0,
-		-1.0,  1.0,  1.0,
-		-1.0,  1.0, -1.0,
-
-		-1.0, -1.0, -1.0,
-		-1.0, -1.0,  1.0,
-		 1.0, -1.0, -1.0,
-		 1.0, -1.0, -1.0,
-		-1.0, -1.0,  1.0,
-		 1.0, -1.0,  1.0
-	];
-	
 	var relics: Map<String, Relic> = new Map();
 
 	var cubeMesh: Mesh;
@@ -225,7 +169,6 @@ class Game extends OpenGLView
 		
 		TextureManager.load("cobble", "graphics/cobble.png");
 		
-		//TODO pack all relic sprites (or maybe everything?) into a spritesheet
 		TextureManager.load("black_candle", 	"graphics/black_candle.png");
 		TextureManager.load("suggestive_book", 	"graphics/suggestive_book.png");
 		TextureManager.load("donut", 			"graphics/donut.png");
@@ -243,11 +186,10 @@ class Game extends OpenGLView
 		TextureManager.load("summon",			"graphics/summon.png");
 		desertMap.load();
 		
-		quadMesh = new Mesh(quad, quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
-		skyboxMesh = new Mesh(skyboxVertices, [], ["position"], [3]);
+		quadMesh = new Mesh(Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
+		skyboxMesh = new Mesh(Geometry.skyboxVertices, [], ["position"], [3]);
 		
 		model = new Mat4();
-		
 		orthoView = new Mat4().translate(0, 0, -1);
 		
 		Lib.current.stage.addChild(overlay);
@@ -280,16 +222,12 @@ class Game extends OpenGLView
 		
 		updateScene(delta);
 		
-		GL.enable(GL.DEPTH_TEST);
-		GL.depthFunc(GL.LEQUAL);
+		renderer.depthTest(GL.LEQUAL);
+		renderer.blend(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
 		
-		GL.viewport(0, 0, Std.int(rect.width), Std.int(rect.height));
+		renderer.viewport(0, 0, Std.int(rect.width), Std.int(rect.height));
 		
-		GL.clearColor(0.0, 0.0, 0.0, 1.0);
-		GL.enable(GL.BLEND);
-		GL.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
-		
-		GL.clear(GL.DEPTH_BUFFER_BIT | GL.COLOR_BUFFER_BIT);
+		renderer.clear();
 		
 		renderer.uploadProgram(simpleProgram);
 		
@@ -304,27 +242,25 @@ class Game extends OpenGLView
 		var h: Int = Std.int(rect.height);
 		gameInfo.viewports = viewportLayout;
 		
-		//TODO turn renderPlayerPOV method into renderPOV in player
 		for (i in 0...players.length)
 		{
 			var vp: Rectangle = viewportLayout[i];
 			renderPlayerPOV(players[i], Std.int(w * vp.x), Std.int(h * vp.y), Std.int(w * vp.width), Std.int(h * vp.height));
-			GL.viewport(0, 0, w, h);
 		}
 		
+		renderer.viewport(0, 0, w, h);
 		overlay.update(delta, gameInfo);
 	}
 	
-	function renderPlayerPOV(player: Player, x: Int, y: Int, w: Int, h: Int)
+	function renderPlayerPOV(player: Player, x: Int, y: Int, w: Int, h: Int): Void
 	{
-		GL.viewport(x, Lib.current.stage.stageHeight - y - h, w, h);
+		renderer.viewport(x, Lib.current.stage.stageHeight - y - h, w, h);
 		
 		Camera.current = player.camera;
 		
 		var proj: Mat4 = new Mat4().perspective(player.fov, w / h, 0.1, 100.0);
 		var ortho: Mat4 = new Mat4().ortho(0, w, h, 0, 0.1, 100.0);
 		
-		GL.depthMask(false);
 		renderer.uploadProgram(skyboxProgram);
 		
 		renderer.uniformMatrix("view", player.camera.getView());
@@ -335,7 +271,6 @@ class Game extends OpenGLView
 		renderer.renderMesh(skyboxMatrix);
 		desertMap.unbindTex();
 		
-		GL.depthMask(true);
 		renderer.uploadProgram(simpleProgram);
 		
 		renderer.uniformMatrix("view", player.camera.getView());

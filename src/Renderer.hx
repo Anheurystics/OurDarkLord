@@ -19,11 +19,48 @@ class Renderer
 
 	var nVertices: Int;
 	var nIndices: Int;
-
+	
 	public function new() 
 	{
 	}
 
+	public function viewport(x: Int, y: Int, w: Int, h: Int): Void
+	{
+		GL.viewport(x, y, w, h);
+	}
+	
+	public function depthTest(func: Int = null): Void
+	{
+		if (func != null)
+		{
+			GL.enable(GL.DEPTH_TEST);
+			GL.depthFunc(func);
+		}
+		else
+		{
+			GL.disable(GL.DEPTH_TEST);
+		}
+	}
+	
+	public function blend(src: Int = null, dest: Int = null): Void
+	{
+		if (src != null && dest != null)
+		{
+			GL.enable(GL.BLEND);
+			GL.blendFunc(src, dest);
+		}
+		else
+		{
+			GL.disable(GL.BLEND);
+		}
+	}
+	
+	public function clear(r: Float = 0.0, g: Float = 0.0, b: Float = 0.0)
+	{
+		GL.clearColor(r, g, b, 1.0);	
+		GL.clear(GL.DEPTH_BUFFER_BIT | GL.COLOR_BUFFER_BIT);		
+	}
+	
 	public function uploadProgram(program: ShaderProgram)
 	{
 		this.program = program;
