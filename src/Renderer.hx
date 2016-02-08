@@ -1,6 +1,9 @@
 package;
+import haxe.macro.Expr.Var;
+import lime.utils.Int32Array;
 import openfl.gl.GL;
 import openfl.gl.GLBuffer;
+import openfl.gl.GLUniformLocation;
 import openfl.utils.Float32Array;
 import openfl.utils.Int16Array;
 
@@ -96,7 +99,7 @@ class Renderer
 	{
 		if (transform != null)
 		{
-			GL.uniformMatrix4fv(program.uniform("model"), false, transform.array());
+			uniformMatrix("model", transform);
 		}
 			
 		if (nIndices > 0)
@@ -106,6 +109,46 @@ class Renderer
 		else
 		{
 			GL.drawArrays(GL.TRIANGLES, 0, Std.int(nVertices / 3));
+		}
+	}
+	
+	public function uniformf(name: String, d1: Float, d2: Float = null, d3: Float = null, d4: Float = null)
+	{
+		var loc: GLUniformLocation = program.uniform(name);
+		if (d2 == null) 		GL.uniform1f(loc, d1);
+		else if (d3 == null) 	GL.uniform2f(loc, d1, d2);
+		else if (d4 == null) 	GL.uniform3f(loc, d1, d2, d3);
+		else 					GL.uniform4f(loc, d1, d2, d3, d4);
+	}
+	
+	var uniformFV: Array<GLUniformLocation->Float32Array->Void> = [GL.uniform1fv, GL.uniform2fv, GL.uniform3fv, GL.uniform4fv];
+	public function uniformfv(name: String, arr: Float32Array)
+	{
+		var loc: GLUniformLocation = program.uniform(name);
+		uniformFV[arr.length - 1](loc, arr);
+	}
+	
+	var uniformIV: Array<GLUniformLocation->Int32Array->Void> = [GL.uniform1iv, GL.uniform2iv, GL.uniform3iv, GL.uniform4iv];
+	public function uniformiv(name: String, arr: Int32Array)
+	{
+		var loc: GLUniformLocation = program.uniform(name);
+		uniformIV[arr.length - 1](loc, arr);
+	}
+	
+	public function uniformi(name: String, d1: Int, d2: Int = null, d3: Int = null, d4: Int = null)
+	{
+		var loc: GLUniformLocation = program.uniform(name);
+		if (d2 == null) 		GL.uniform1i(loc, d1);
+		else if (d3 == null) 	GL.uniform2i(loc, d1, d2);
+		else if (d4 == null) 	GL.uniform3i(loc, d1, d2, d3);
+		else 					GL.uniform4i(loc, d1, d2, d3, d4);
+	}
+	
+	public function uniformMatrix(name: String, mat: Mat): Void
+	{
+		if (mat.type() == 4)
+		{
+			GL.uniformMatrix4fv(program.uniform(name), false, mat.array());
 		}
 	}
 }

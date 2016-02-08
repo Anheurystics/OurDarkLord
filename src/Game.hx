@@ -77,8 +77,7 @@ class Game extends OpenGLView
 	];
 	
 	var relics: Map<String, Relic> = new Map();
-	
-	//TODO refactor everything into a renderer
+
 	var cubeMesh: Mesh;
 	var quadMesh: Mesh;
 	var skyboxMesh: Mesh;
@@ -320,11 +319,11 @@ class Game extends OpenGLView
 		
 		renderer.uploadProgram(shaderProgram);
 		
-		GL.uniform1i(shaderProgram.uniform("tex1"), 0);
-		GL.uniform1i(shaderProgram.uniform("useFog"), 0);
-		GL.uniform1f(shaderProgram.uniform("fogDistance"), 5);
-		GL.uniform1f(shaderProgram.uniform("fogRate"), 1);		
-		GL.uniform4f(shaderProgram.uniform("fogColor"), 0.6, 0.0, 0.0, 1.0);	
+		renderer.uniformi("tex1", 0);
+		renderer.uniformi("useFog", 0);
+		renderer.uniformf("fogDistance", 5);
+		renderer.uniformf("fogRate", 1);
+		renderer.uniformf("fogColor", 0.6, 0.0, 0.0, 1.0);
 		
 		var viewportLayout: Array<Rectangle> = viewports[players.length - 1];
 		var w: Int = Std.int(rect.width);
@@ -353,9 +352,8 @@ class Game extends OpenGLView
 		GL.depthMask(false);
 		renderer.uploadProgram(skyboxProgram);
 		
-		//TODO lessen uniform matrix allocation
-		GL.uniformMatrix4fv(skyboxProgram.uniform("view"), false, player.camera.getView());
-		GL.uniformMatrix4fv(skyboxProgram.uniform("proj"), false, proj.array());	
+		renderer.uniformMatrix("view", player.camera.getView());
+		renderer.uniformMatrix("proj", proj);
 		
 		desertMap.bindTex();
 		renderer.uploadMesh(skyboxMesh);
@@ -365,36 +363,37 @@ class Game extends OpenGLView
 		GL.depthMask(true);
 		renderer.uploadProgram(shaderProgram);
 		
-		GL.uniformMatrix4fv(shaderProgram.uniform("view"), false, player.camera.getView());
-		GL.uniformMatrix4fv(shaderProgram.uniform("proj"), false, proj.array());	
-		GL.uniform3f(shaderProgram.uniform("cameraPos"), player.x, 0, player.z);
+		trace("mark");
+		renderer.uniformMatrix("view", player.camera.getView());
+		renderer.uniformMatrix("proj", proj);
+		renderer.uniformf("cameraPos", player.x, 0, player.z);
 		
 		renderer.uploadMesh(quadMesh);
 		
-		GL.uniform2f(shaderProgram.uniform("tile"), planeWidth, planeLength);
-		TextureManager.get("cobble").bind(shaderProgram, GL.TEXTURE0);
+		renderer.uniformf("tile", planeWidth, planeLength);
+		TextureManager.get("cobble").bind(GL.TEXTURE0);
 		renderer.renderMesh(floorMatrix);
 		
-		GL.uniform2f(shaderProgram.uniform("tile"), 1, 1);
-		TextureManager.get("circle_1").bind(shaderProgram, GL.TEXTURE0);
+		renderer.uniformf("tile", 1, 1);
+		TextureManager.get("circle_1").bind(GL.TEXTURE0);
 		renderer.renderMesh(circleMatrix);
 		
 		for (p in players)
 		{
 			if (p != player)
 			{
-				TextureManager.get("cultist_sheet").bind(shaderProgram, GL.TEXTURE0);
+				TextureManager.get("cultist_sheet").bind(GL.TEXTURE0);
 				p.sprite.bind(shaderProgram);
 				renderer.renderMesh();
 			}
 		}
 		
 		for (relic in relics)
-		{			
-			GL.uniform1f(shaderProgram.uniform("flipX"), 1);
-			GL.uniform2f(shaderProgram.uniform("offset"), 0, 0);
-			GL.uniform2f(shaderProgram.uniform("tile"), 1, 1);				
-			TextureManager.get(relic.type).bind(shaderProgram, GL.TEXTURE0);
+		{
+			renderer.uniformf("flipX", 1);
+			renderer.uniformf("offset", 0, 0);
+			renderer.uniformf("title", 1, 1);		
+			TextureManager.get(relic.type).bind(GL.TEXTURE0);
 			var relicTransform: Mat4 = null;
 			
 			if (relic.state == Relic.STATE_GROUND || relic.state == Relic.STATE_THROWN)
@@ -413,7 +412,7 @@ class Game extends OpenGLView
 					
 					playerHand.scale(-0.4, 0.4, 0.4).rotate(90 - player.lookAngle, Vector3D.Y_AXIS).translate(player.x + (Math.cos(rad + pioffset) * 0.5), player.holding.sprite.y, player.z + (Math.sin(rad + pioffset) * 0.5));					
 					
-					GL.uniform2f(shaderProgram.uniform("tile"), 1, 1);
+					renderer.uniformf("tile", 1, 1);
 					relicTransform = playerHand;							
 				}
 				else
@@ -427,14 +426,14 @@ class Game extends OpenGLView
 			}
 			
 			renderer.renderMesh(relicTransform);
-			TextureManager.get(relic.type).unbind(shaderProgram);
+			TextureManager.get(relic.type).unbind();
 		}
 		
 		renderer.uploadProgram(overlayProgram);	
-		GL.uniform1f(overlayProgram.uniform("alpha"), 1.0);
-		GL.uniform3fv(overlayProgram.uniform("tint"), colorWhite);
-		GL.uniformMatrix4fv(overlayProgram.uniform("view"), false, orthoView.array());
-		GL.uniformMatrix4fv(overlayProgram.uniform("proj"), false, ortho.array());
+		renderer.uniformf("alpha", 1.0);
+		renderer.uniformfv("tint", colorWhite);
+		renderer.uniformMatrix("view", orthoView);
+		renderer.uniformMatrix("proj", ortho);
 		
 		var mat = new Mat4().identity().scale(-50, -50, 1).translate(30, 30, 0);
 		
@@ -446,14 +445,14 @@ class Game extends OpenGLView
 			{
 				player.numberCorrectItems += 1;
 			}
-			GL.uniform1f(overlayProgram.uniform("alpha"), onCircle ? 1.0: .25);
-			TextureManager.get(player.goalRelics[i]).bind(overlayProgram, GL.TEXTURE0);
+			renderer.uniformf("alpha", onCircle ? 1.0: .25);
+			TextureManager.get(player.goalRelics[i]).bind(GL.TEXTURE0);
 			renderer.renderMesh(mat);
 			
 			mat.translate(50, 0, 0);
 		}
 		
-		GL.uniform1f(overlayProgram.uniform("alpha"), 1.0);
+		renderer.uniformf("alpha", 1.0);
 		
 		player.numberWrongItems = 0;
 		for (relicType in relics.keys())
@@ -462,26 +461,26 @@ class Game extends OpenGLView
 			{
 				player.numberWrongItems += 1;
 				
-				GL.uniform3fv(overlayProgram.uniform("tint"), colorRed);
-				TextureManager.get(relicType).bind(overlayProgram, GL.TEXTURE0);
+				renderer.uniformfv("tint", colorRed);
+				TextureManager.get(relicType).bind(GL.TEXTURE0);
 				renderer.renderMesh(mat);
 				
 				mat.translate(50, 0, 0);
 			}
 		}
 		
-		GL.uniform1f(overlayProgram.uniform("alpha"), 1.0);
-		GL.uniform3fv(overlayProgram.uniform("tint"), colorWhite);
+		renderer.uniformf("alpha", 1.0);
+		renderer.uniformfv("tint", colorWhite);
 		
-		TextureManager.get("stamina").bind(overlayProgram, GL.TEXTURE0);
+		TextureManager.get("stamina").bind(GL.TEXTURE0);
 		mat.identity().scale(2 * player.stamina, 30, 1).translate(player.stamina + 70, 100, 0);
 		renderer.renderMesh(mat);
 		
-		TextureManager.get("summon").bind(overlayProgram, GL.TEXTURE0);
+		TextureManager.get("summon").bind(GL.TEXTURE0);
 		mat.identity().scale(20 * player.summonLength, 30, 1).translate((player.summonLength * 10) + 30, 150, 0);
 		renderer.renderMesh(mat);
 		
-		TextureManager.get("circle_1").bind(shaderProgram, GL.TEXTURE0);	
+		TextureManager.get("circle_1").bind(GL.TEXTURE0);	
 		mat.identity().scale(40, 40, 1).translate(25, 150, 0);
 		renderer.renderMesh(mat);
 	}

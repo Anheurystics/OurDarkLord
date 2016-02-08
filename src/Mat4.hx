@@ -3,7 +3,7 @@ import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
 import openfl.utils.Float32Array;
 
-class Mat4
+class Mat4 implements Mat
 {
 	private var _matrix: Matrix3D;
 	private var _array: Float32Array;
@@ -98,5 +98,10 @@ class Mat4
 			];
 			
 		return this;
+	}
+	
+	public function type(): Int
+	{
+		return 4;
 	}
 }
