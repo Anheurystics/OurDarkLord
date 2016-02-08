@@ -91,7 +91,8 @@ class GLMenu extends OpenGLView
 		
 		renderer.uniformf("flipX", 1);
 		renderer.uniformf("offset", 0, 0);
-		renderer.uniformf("tile", 1, 1);		
+		renderer.uniformf("tile", 1, 1);
+		renderer.uniformf("tint", 1.0, 1.0, 1.0);
 		
 		renderer.uniformMatrix("view", cam.getView());
 		renderer.uniformMatrix("proj", cam.getProjection());
