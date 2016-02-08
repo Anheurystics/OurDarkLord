@@ -31,7 +31,7 @@ class Player extends Entity
 	
 	var controller: PlayerController;
 	
-	public function new(_name: String, _x: Float = 0,  _z: Float = 0, _lookAngle: Float = 0, _gamepad: Int = -1) 
+	public function new(_name: String, _x: Float = 0,  _z: Float = 0, _lookAngle: Float = 0, _controller: PlayerController) 
 	{
 		super(_x, _z);
 		name = _name;
@@ -40,7 +40,7 @@ class Player extends Entity
 		camera = new Camera();
 		camera.setToPlayer(this);
 		
-		controller = new InputController(_gamepad);
+		controller = _controller;
 		
 		sprite = Billboard.create(Billboard.PERSPECTIVE_MIN);
 	}

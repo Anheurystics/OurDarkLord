@@ -157,7 +157,7 @@ class Game extends OpenGLView
 				Math.cos(i * angleDiff) * ((gameInfo.bounds / 2) - 1),
 				Math.sin(i * angleDiff) * ((gameInfo.bounds / 2) - 1),
 				Utils.toDeg(i * angleDiff),
-				controls[i]	
+				new InputController(controls[i])
 			));
 			
 			while (true)
