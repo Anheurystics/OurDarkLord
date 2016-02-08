@@ -382,7 +382,7 @@ class Game extends OpenGLView
 			if (p != player)
 			{
 				TextureManager.get("cultist_sheet").bind(GL.TEXTURE0);
-				p.sprite.bind(shaderProgram);
+				p.sprite.bind(renderer);
 				renderer.renderMesh();
 			}
 		}
@@ -397,7 +397,7 @@ class Game extends OpenGLView
 			
 			if (relic.state == Relic.STATE_GROUND || relic.state == Relic.STATE_THROWN)
 			{
-				relic.sprite.bind(shaderProgram);
+				relic.sprite.bind(renderer);
 			}
 			else
 			if(relic.state == Relic.STATE_HELD)
@@ -420,7 +420,7 @@ class Game extends OpenGLView
 					{			
 						continue;
 					}
-					relic.sprite.bind(shaderProgram);
+					relic.sprite.bind(renderer);
 				}
 			}
 			

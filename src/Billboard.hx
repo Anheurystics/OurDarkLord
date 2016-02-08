@@ -15,9 +15,7 @@ typedef Sequence =
 };
 
 class Billboard
-{
-	public static var identity: Float32Array = new Float32Array(new Matrix3D().rawData);
-	
+{	
 	public static inline var STATIC: Int = 0;
 	public static inline var PERSPECTIVE: Int = 1;
 	public static inline var PERSPECTIVE_MIN: Int = 2;
@@ -47,7 +45,9 @@ class Billboard
 	var timer: Float;
 	var finishCallback: String->String->Void;
 	
-	var sequences: Map<String, Sequence>;	
+	var sequences: Map<String, Sequence>;
+	
+	var matrix: Mat4;
 	
 	function new()
 	{
@@ -58,6 +58,8 @@ class Billboard
 		xScale = 1;
 		yScale = 1;
 		lookAt = null;
+		
+		matrix = new Mat4();
 	}
 	
 	public static function create(_type: Int): Billboard
@@ -130,7 +132,7 @@ class Billboard
 		}
 	}
 	
-	public function bind(shader: ShaderProgram): Void
+	public function bind(renderer: Renderer): Void
 	{
 		lookAt = Camera.current.position;
 		var diff1: Float = Math.atan2(z - lookAt.z, x -  lookAt.x);
@@ -158,15 +160,15 @@ class Billboard
 					}
 				}
 				
-				GL.uniform1f(shader.uniform("flipX"), flipX);
-				GL.uniform2f(shader.uniform("offset"), angle / angles, 0);
-				GL.uniform2f(shader.uniform("tile"), 1 / angles, 1);
+				renderer.uniformf("flipX", flipX);
+				renderer.uniformf("offset", angle / angles, 0);
+				renderer.uniformf("tile", 1 / angles, 1);
 			}
 			else
 			{
-				GL.uniform1f(shader.uniform("flipX"), 1);
-				GL.uniform2f(shader.uniform("offset"), 0, 0);
-				GL.uniform2f(shader.uniform("tile"), 1, 1);				
+				renderer.uniformf("flipX", 1);
+				renderer.uniformf("offset", 0, 0);
+				renderer.uniformf("tile", 1 / 1);
 			}
 		}
 		else
@@ -201,27 +203,12 @@ class Billboard
 				j = currentIndex % rows;
 			}
 			
-			GL.uniform1f(shader.uniform("flipX"), flipX);
-			GL.uniform2f(shader.uniform("offset"), i * widthRatio, j * heightRatio);
-			GL.uniform2f(shader.uniform("tile"), widthRatio, heightRatio);	
+			renderer.uniformf("flipX", flipX);
+			renderer.uniformf("offset", i * widthRatio, j * heightRatio);
+			renderer.uniformf("tile", widthRatio, heightRatio);			
 		}
 		
-		var mat: Matrix3D = new Matrix3D();
-		var rotation: Float = Utils.toDeg(Math.atan2(lookAt.x - x, lookAt.z - z));		
-		
-		mat.appendScale(xScale, yScale, 0);
-		mat.appendRotation(Std.int(rotation / 5) * 5, Vector3D.Y_AXIS);
-		mat.appendTranslation(x, y, z);
-
-		GL.uniformMatrix4fv(shader.uniform("model"), false, new Float32Array(mat.rawData));	
-	}
-	
-	public function unbind(shader: ShaderProgram): Void
-	{
-		GL.uniform1f(shader.uniform("flipX"), 1);
-		GL.uniform2f(shader.uniform("offset"), 0, 0);
-		GL.uniform2f(shader.uniform("tile"), 1, 1);		
-		
-		GL.uniformMatrix4fv(shader.uniform("model"), false, identity);
+		matrix.identity().scale(xScale, yScale, 0).rotate(Std.int(Utils.toDeg(Math.atan2(lookAt.x - x, lookAt.z - z)) / 5) * 5, Vector3D.Y_AXIS).translate(x, y, z);
+		renderer.uniformMatrix("model", matrix);
 	}
 }
