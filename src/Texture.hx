@@ -81,13 +81,13 @@ class Texture
 		return n == 1;
 	}
 	
-	public function bind(shader: ShaderProgram, unit: Int): Void
+	public function bind(unit: Int): Void
 	{
 		GL.activeTexture(unit);
 		GL.bindTexture(GL.TEXTURE_2D, tex);
 	}
 	
-	public function unbind(shader: ShaderProgram): Void
+	public function unbind(): Void
 	{
 		GL.bindTexture (GL.TEXTURE_2D, null);
 	}

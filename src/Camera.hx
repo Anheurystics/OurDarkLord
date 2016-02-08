@@ -59,10 +59,10 @@ class Camera
 		up.normalize();
 	}
 	
-	public function getView(): Float32Array
+	public function getView(): Mat4
 	{
 		_view.lookAt(position, position.add(front), up);
 		
-		return _view.array();
+		return _view;
 	}
 }
