@@ -52,11 +52,11 @@ class GLMenu extends OpenGLView
 		cam.yaw = 0;
 		
 		//Not sure why valeus are these :O
-		cultist1 = placeCultist(0);
-		cultist2 = placeCultist(60);
-		cultist3 = placeCultist(-60);
-		cultist4 = placeCultist(120);
-		cultist5 = placeCultist(-120);
+		cultist1 = placeCultist(-120);
+		cultist2 = placeCultist(-60);
+		cultist3 = placeCultist(0);
+		cultist4 = placeCultist(60);
+		cultist5 = placeCultist(120);
 		
 		renderer.uploadProgram(simpleProgram);
 		renderer.uniformi("tex1", 0);

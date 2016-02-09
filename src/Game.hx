@@ -235,6 +235,7 @@ class Game extends OpenGLView
 		renderer.uniformi("useFog", 0);
 		renderer.uniformf("fogDistance", 5);
 		renderer.uniformf("fogRate", 1);
+		renderer.uniformfv("tint", colorWhite);
 		renderer.uniformf("fogColor", 0.6, 0.0, 0.0, 1.0);
 		
 		var viewportLayout: Array<Rectangle> = viewports[players.length - 1];
