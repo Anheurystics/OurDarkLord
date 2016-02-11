@@ -8,7 +8,7 @@ class TextureManager
 	static var textures: Map<String, Texture> = new Map();
 	static var areas: Map<String, Map<String, Rectangle>> = new Map();
 	
-	public static function load(name: String, source: Dynamic, filter: Int = GL.NEAREST): Void
+	public static function load(name: String, source: Dynamic, filter: Int = GL.NEAREST)
 	{
 		textures.set(name, new Texture(source, filter));
 	}

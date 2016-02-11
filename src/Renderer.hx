@@ -67,6 +67,12 @@ class Renderer
 		program.bind();
 	}
 	
+	public function uploadTexture(tex: Texture, unit: Int = GL.TEXTURE0)
+	{
+		GL.activeTexture(unit);
+		GL.bindTexture(GL.TEXTURE_2D, tex.tex);
+	}
+	
 	public function uploadMesh(mesh: Mesh): Void
 	{		
 		nVertices = mesh.nVertices;

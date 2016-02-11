@@ -253,7 +253,7 @@ class Game extends OpenGLView
 		overlay.update(delta, gameInfo);
 	}
 	
-	function renderPlayerPOV(player: Player, x: Int, y: Int, w: Int, h: Int): Void
+	private function renderPlayerPOV(player: Player, x: Int, y: Int, w: Int, h: Int)
 	{
 		renderer.viewport(x, Lib.current.stage.stageHeight - y - h, w, h);
 		
@@ -281,18 +281,18 @@ class Game extends OpenGLView
 		renderer.uploadMesh(quadMesh);
 		
 		renderer.uniformf("tile", planeWidth, planeLength);
-		TextureManager.get("cobble").bind(GL.TEXTURE0);
+		renderer.uploadTexture(TextureManager.get("cobble"));
 		renderer.renderMesh(floorMatrix);
 		
 		renderer.uniformf("tile", 1, 1);
-		TextureManager.get("circle_1").bind(GL.TEXTURE0);
+		renderer.uploadTexture(TextureManager.get("circle_1"));
 		renderer.renderMesh(circleMatrix);
 		
 		for (p in players)
 		{
 			if (p != player)
 			{
-				TextureManager.get("cultist_sheet").bind(GL.TEXTURE0);
+				renderer.uploadTexture(TextureManager.get("cultist_sheet"));
 				p.sprite.bind(renderer);
 				renderer.renderMesh();
 			}
@@ -303,7 +303,7 @@ class Game extends OpenGLView
 			renderer.uniformf("flipX", 1);
 			renderer.uniformf("offset", 0, 0);
 			renderer.uniformf("title", 1, 1);		
-			TextureManager.get(relic.type).bind(GL.TEXTURE0);
+			renderer.uploadTexture(TextureManager.get(relic.type));
 			var relicTransform: Mat4 = null;
 			
 			if (relic.state == Relic.STATE_GROUND || relic.state == Relic.STATE_THROWN)
@@ -336,7 +336,7 @@ class Game extends OpenGLView
 			}
 			
 			renderer.renderMesh(relicTransform);
-			TextureManager.get(relic.type).unbind();
+			renderer.uploadTexture(TextureManager.get(relic.type));
 		}
 		
 		renderer.uploadProgram(overlayProgram);	
@@ -356,7 +356,7 @@ class Game extends OpenGLView
 				player.numberCorrectItems += 1;
 			}
 			renderer.uniformf("alpha", onCircle ? 1.0: .25);
-			TextureManager.get(player.goalRelics[i]).bind(GL.TEXTURE0);
+			renderer.uploadTexture(TextureManager.get(player.goalRelics[i]));
 			renderer.renderMesh(mat);
 			
 			mat.translate(50, 0, 0);
@@ -372,7 +372,7 @@ class Game extends OpenGLView
 				player.numberWrongItems += 1;
 				
 				renderer.uniformfv("tint", colorRed);
-				TextureManager.get(relicType).bind(GL.TEXTURE0);
+				renderer.uploadTexture(TextureManager.get(relicType));
 				renderer.renderMesh(mat);
 				
 				mat.translate(50, 0, 0);
@@ -382,15 +382,16 @@ class Game extends OpenGLView
 		renderer.uniformf("alpha", 1.0);
 		renderer.uniformfv("tint", colorWhite);
 		
-		TextureManager.get("stamina").bind(GL.TEXTURE0);
+		
+		renderer.uploadTexture(TextureManager.get("stamina"));
 		mat.identity().scale(2 * player.stamina, 30, 1).translate(player.stamina + 70, 100, 0);
 		renderer.renderMesh(mat);
 		
-		TextureManager.get("summon").bind(GL.TEXTURE0);
+		renderer.uploadTexture(TextureManager.get("summon"));
 		mat.identity().scale(20 * player.summonLength, 30, 1).translate((player.summonLength * 10) + 30, 150, 0);
 		renderer.renderMesh(mat);
 		
-		TextureManager.get("circle_1").bind(GL.TEXTURE0);	
+		renderer.uploadTexture(TextureManager.get("circle_1"));
 		mat.identity().scale(40, 40, 1).translate(25, 150, 0);
 		renderer.renderMesh(mat);
 	}

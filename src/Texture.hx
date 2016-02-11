@@ -8,7 +8,7 @@ import openfl.utils.UInt8Array;
 
 class Texture
 {
-	var tex: GLTexture;
+	public var tex: GLTexture;
 	
 	public var width: Int;
 	public var height: Int;

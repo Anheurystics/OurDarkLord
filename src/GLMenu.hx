@@ -89,11 +89,6 @@ class GLMenu extends OpenGLView
 		TextureManager.load("title", titleBD, GL.LINEAR);
 	}
 
-	function resize()
-	{
-		
-	}
-	
 	function placeCultist(angle: Float): Billboard
 	{
 		var cultist: Billboard = Billboard.create(Billboard.PERSPECTIVE_MIN);
