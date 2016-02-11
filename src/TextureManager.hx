@@ -1,15 +1,16 @@
 package;
 
 import openfl.geom.Rectangle;
+import openfl.gl.GL;
 
 class TextureManager
 {	
 	static var textures: Map<String, Texture> = new Map();
 	static var areas: Map<String, Map<String, Rectangle>> = new Map();
 	
-	public static function load(name: String, source: Dynamic): Void
+	public static function load(name: String, source: Dynamic, filter: Int = GL.NEAREST): Void
 	{
-		textures.set(name, new Texture(source));
+		textures.set(name, new Texture(source, filter));
 	}
 	
 	public static function setTextureArea(textureName: String, areaName: String, area: Rectangle)

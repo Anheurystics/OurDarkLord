@@ -7,43 +7,20 @@ import openfl.gl.GLTexture;
 import openfl.utils.UInt8Array;
 
 class Texture
-{	
-	static var textures: Array<Texture> = new Array();
-	public static function restoreAll(): Void
-	{
-		for (texture in textures)
-		{
-			texture.restore();
-		}
-	}	
-	
+{
 	var tex: GLTexture;
 	
 	public var width: Int;
 	public var height: Int;
-	var source: Dynamic;
-	
-	public function new(_source: Dynamic)
-	{
-		source = _source;
-		
-		restore();
-		textures.push(this);
-	}
-	
-	public function restore(): Void
+
+	public function new(source: Dynamic, filter: Int = GL.NEAREST)
 	{
 		var bitmapData: BitmapData = null;
 		if(Std.is(source, BitmapData))
 			bitmapData = cast(source, BitmapData);
 		if (Std.is(source, String))
 			bitmapData = Assets.getBitmapData(cast(source, String));
-			
-		if (bitmapData == null)
-		{
-			return;
-		}
-			
+		
 		width = bitmapData.width;
 		height = bitmapData.height;
 			
@@ -67,8 +44,8 @@ class Texture
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, wrap);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, wrap);
 		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, filter);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter);
 		GL.bindTexture (GL.TEXTURE_2D, null);
 	}
 	
