@@ -1,8 +1,15 @@
 package;
 import flash.geom.Vector3D;
+import openfl.Assets;
+import openfl.Lib;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 import openfl.display.OpenGLView;
 import openfl.geom.Rectangle;
 import openfl.gl.GL;
+import openfl.text.TextField;
+import openfl.text.TextFormat;
+import openfl.text.TextFormatAlign;
 
 class GLMenu extends OpenGLView
 {
@@ -51,7 +58,6 @@ class GLMenu extends OpenGLView
 		cam.position.x = -3.5;
 		cam.yaw = 0;
 		
-		//Not sure why valeus are these :O
 		cultist1 = placeCultist(-120);
 		cultist2 = placeCultist(-60);
 		cultist3 = placeCultist(0);
@@ -65,8 +71,29 @@ class GLMenu extends OpenGLView
 		renderer.uniformf("fogRate", 1);
 		renderer.uniformf("fogColor", 0.1, 0.1, 0.1, 1.0);
 		renderer.uniformf("cameraPos", cam.position.x, cam.position.y, cam.position.z);
+		
+		var title: TextField = new TextField();
+		var format: TextFormat = new TextFormat(Assets.getFont("fonts/straighttohell.bb.ttf").fontName, 96, 0xCC0000);
+		format.align = TextFormatAlign.CENTER;
+		
+		title.text = "Our Dark Lord\nis\nBetter Than Yours";
+		title.defaultTextFormat = format;
+		title.embedFonts = true;
+		
+		title.width = title.textWidth;
+		title.height = title.textHeight * 3;
+		
+		var titleBD: BitmapData = new BitmapData(Std.int(title.textWidth), Std.int(title.textHeight), true, 0);
+		titleBD.draw(title, null, null, null, null, true);
+		
+		TextureManager.load("title", titleBD, GL.LINEAR);
 	}
 
+	function resize()
+	{
+		
+	}
+	
 	function placeCultist(angle: Float): Billboard
 	{
 		var cultist: Billboard = Billboard.create(Billboard.PERSPECTIVE_MIN);
@@ -119,5 +146,15 @@ class GLMenu extends OpenGLView
 		renderer.renderMesh();
 		cultist5.bind(renderer);
 		renderer.renderMesh();
+		
+		renderer.uniformf("flipX", 1);
+		renderer.uniformf("offset", 0, 0);
+		renderer.uniformf("tile", 1, 1);
+		renderer.uniformf("tint", 1.0, 1.0, 1.0);		
+		
+		var titleTex: Texture = TextureManager.get("title");
+		titleTex.bind(GL.TEXTURE0);
+		mat.identity().rotate( -90, Vector3D.Y_AXIS).scale(1.0, 2.0, 2.0 * titleTex.width / titleTex.height).translate(-0.5, 2.0, 0);
+		renderer.renderMesh(mat);
 	}
 }
