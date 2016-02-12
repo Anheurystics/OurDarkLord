@@ -24,6 +24,8 @@ class GLMenu extends OpenGLView
 	var cultist4: Billboard;
 	var cultist5: Billboard;
 	
+	var titleMatrix: Mat4;
+	
 	public function new() 
 	{
 		super();
@@ -75,18 +77,18 @@ class GLMenu extends OpenGLView
 		var title: TextField = new TextField();
 		var format: TextFormat = new TextFormat(Assets.getFont("fonts/straighttohell.bb.ttf").fontName, 96, 0xCC0000);
 		format.align = TextFormatAlign.CENTER;
-		
 		title.text = "Our Dark Lord\nis\nBetter Than Yours";
 		title.defaultTextFormat = format;
 		title.embedFonts = true;
-		
 		title.width = title.textWidth;
-		title.height = title.textHeight * 3;
-		
+		title.height = title.textHeight * 1.5;
 		var titleBD: BitmapData = new BitmapData(Std.int(title.textWidth), Std.int(title.textHeight), true, 0);
 		titleBD.draw(title, null, null, null, null, true);
 		
 		TextureManager.load("title", titleBD, GL.LINEAR);
+		
+		var titleTex: Texture = TextureManager.get("title");
+		titleMatrix = new Mat4().identity().rotate( -90, Vector3D.Y_AXIS).scale(1.0, 2.0, 2.0 * titleTex.width / titleTex.height).translate( -0.5, 2.0, 0);
 	}
 
 	function placeCultist(angle: Float): Billboard
@@ -149,7 +151,6 @@ class GLMenu extends OpenGLView
 		
 		var titleTex: Texture = TextureManager.get("title");
 		titleTex.bind(GL.TEXTURE0);
-		mat.identity().rotate( -90, Vector3D.Y_AXIS).scale(1.0, 2.0, 2.0 * titleTex.width / titleTex.height).translate(-0.5, 2.0, 0);
-		renderer.renderMesh(mat);
+		renderer.renderMesh(titleMatrix);
 	}
 }
