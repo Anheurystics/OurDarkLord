@@ -38,27 +38,25 @@ class MapData
 		
 		GL.bindTexture(GL.TEXTURE_CUBE_MAP, skyboxTex);
 		
-		var point: Point = new Point();
+		var skyboxTextures: Array<BitmapData> = [];
 		var d: Int = skyboxDimension;
-		var front: BitmapData = new BitmapData(d, d);
-		front.copyPixels(skyboxImage, new Rectangle(0, d, d, d), point);
-		var left: BitmapData = new BitmapData(d, d);
-		left.copyPixels(skyboxImage, new Rectangle(d, d, d, d), point);
-		var back: BitmapData = new BitmapData(d, d);
-		back.copyPixels(skyboxImage, new Rectangle(d * 2, d, d, d), point);
-		var right: BitmapData = new BitmapData(d, d);
-		right.copyPixels(skyboxImage, new Rectangle(d * 3, d, d, d), point);
-		var up: BitmapData = new BitmapData(d, d);
-		up.copyPixels(skyboxImage, new Rectangle(d * 3, 0, d, d), point);
-		var down: BitmapData = new BitmapData(d, d);
-		down.copyPixels(skyboxImage, new Rectangle(d * 3, d * 2, d, d), point);
+		for(i in 0...6)
+		{
+			skyboxTextures.push(new BitmapData(d, d));
+		}
 		
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, right.image.data);
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, left.image.data);
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, up.image.data);
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, down.image.data);
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, back.image.data);
-		GL.texImage2D(GL.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, front.image.data);
+		var point: Point = new Point();
+		skyboxTextures[0].copyPixels(skyboxImage, new Rectangle(d * 3, d, d, d), point);
+		skyboxTextures[1].copyPixels(skyboxImage, new Rectangle(d, d, d, d), point);
+		skyboxTextures[2].copyPixels(skyboxImage, new Rectangle(d * 3, 0, d, d), point);
+		skyboxTextures[3].copyPixels(skyboxImage, new Rectangle(d * 3, d * 2, d, d), point);
+		skyboxTextures[4].copyPixels(skyboxImage, new Rectangle(d * 2, d, d, d), point);
+		skyboxTextures[5].copyPixels(skyboxImage, new Rectangle(0, d, d, d), point);
+		
+		for(i in 0...6)
+		{
+			GL.texImage2D(GL.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, skyboxTextures[i].image.data);
+		}
 		
 		GL.texParameteri(GL.TEXTURE_CUBE_MAP, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
 		GL.texParameteri(GL.TEXTURE_CUBE_MAP, GL.TEXTURE_MIN_FILTER, GL.NEAREST);

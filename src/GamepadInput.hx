@@ -17,7 +17,7 @@ class GamepadInput
 	static var connectedPads: Array<Gamepad> = [null, null, null, null];
 	
 	public static function init()
-	{
+	{		
 		for (device in Gamepad.devices)
 		{
 			addPad(device);
