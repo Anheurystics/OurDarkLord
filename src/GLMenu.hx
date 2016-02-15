@@ -74,23 +74,36 @@ class GLMenu extends OpenGLView
 		renderer.uniformf("fogColor", 0.1, 0.1, 0.1, 1.0);
 		renderer.uniformf("cameraPos", cam.position.x, cam.position.y, cam.position.z);
 		
-		var title: TextField = new TextField();
 		var format: TextFormat = new TextFormat(Assets.getFont("fonts/straighttohell.bb.ttf").fontName, 96, 0xCC0000);
 		format.align = TextFormatAlign.CENTER;
-		title.text = "Our Dark Lord\nis\nBetter Than Yours";
-		title.defaultTextFormat = format;
-		title.embedFonts = true;
-		title.width = title.textWidth;
-		title.height = title.textHeight * 1.5;
-		var titleBD: BitmapData = new BitmapData(Std.int(title.textWidth), Std.int(title.textHeight), true, 0);
-		titleBD.draw(title, null, null, null, null, true);
 		
-		TextureManager.load("title", titleBD, GL.LINEAR);
+		generateTextureFromText("Our Dark Lord\nis\nBetter Than Yours", format, "menuTitle");
 		
-		var titleTex: Texture = TextureManager.get("title");
+		format.size = 48;
+		generateTextureFromText("Start", format, "menuStart");
+		generateTextureFromText("Options", format, "menuStart");
+		generateTextureFromText("Exit", format, "menuStart");
+		
+		var titleTex: Texture = TextureManager.get("menuTitle");
 		titleMatrix = new Mat4().identity().rotate( -90, Vector3D.Y_AXIS).scale(1.0, 2.0, 2.0 * titleTex.width / titleTex.height).translate( -0.5, 2.0, 0);
 	}
 
+	function generateTextureFromText(text: String, format: TextFormat, texName: String)
+	{
+		var field: TextField = new TextField();
+		
+		field.text = text;
+		field.defaultTextFormat = format;
+		field.embedFonts = true;
+		field.width = field.textWidth;
+		field.height = field.textHeight * 1.5;
+		
+		var data: BitmapData = new BitmapData(Std.int(field.textWidth), Std.int(field.textHeight), true, 0);
+		data.draw(field, null, null, null, null, true);
+		
+		TextureManager.load(texName, data, GL.LINEAR);	
+	}
+	
 	function placeCultist(angle: Float): Billboard
 	{
 		var cultist: Billboard = Billboard.create(Billboard.PERSPECTIVE_MIN);
@@ -149,7 +162,7 @@ class GLMenu extends OpenGLView
 		renderer.uniformf("tile", 1, 1);
 		renderer.uniformf("tint", 1.0, 1.0, 1.0);		
 		
-		var titleTex: Texture = TextureManager.get("title");
+		var titleTex: Texture = TextureManager.get("menuTitle");
 		titleTex.bind(GL.TEXTURE0);
 		renderer.renderMesh(titleMatrix);
 	}
