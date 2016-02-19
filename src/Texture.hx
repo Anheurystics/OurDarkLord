@@ -8,7 +8,7 @@ import openfl.utils.UInt8Array;
 
 class Texture
 {
-	public var tex: GLTexture;
+	public var unit: GLTexture;
 	
 	public var width: Int;
 	public var height: Int;
@@ -30,7 +30,7 @@ class Texture
 		var pixels = new UInt8Array(bitmapData.getPixels(bitmapData.rect));
 		#end
 		
-		tex = GL.createTexture();
+		unit = GL.createTexture();
 		
 		var wrap: Int = GL.REPEAT;
 		#if html5
@@ -40,7 +40,7 @@ class Texture
 		}
 		#end
 		
-		GL.bindTexture(GL.TEXTURE_2D, tex);
+		GL.bindTexture(GL.TEXTURE_2D, unit);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, wrap);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, wrap);
 		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
@@ -58,10 +58,10 @@ class Texture
 		return n == 1;
 	}
 	
-	public function bind(unit: Int): Void
+	public function bind(slot: Int): Void
 	{
-		GL.activeTexture(unit);
-		GL.bindTexture(GL.TEXTURE_2D, tex);
+		GL.activeTexture(slot);
+		GL.bindTexture(GL.TEXTURE_2D, unit);
 	}
 	
 	public function unbind(): Void

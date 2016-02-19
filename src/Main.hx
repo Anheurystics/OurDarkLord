@@ -1,6 +1,7 @@
 package;
 
 import openfl.display.Sprite;
+import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.Lib;
 import openfl.ui.Keyboard;
@@ -36,7 +37,13 @@ class Main extends Sprite
 		
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, KeyboardInput.keyCallback);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyboardInput.keyCallback);		
-		
+		Lib.current.stage.addEventListener(Event.RESIZE, resize);
+        
 		addChild(new GLMenu());
 	}
+    
+    function resize(_)
+    {
+        trace(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
+    }
 }

@@ -20,4 +20,6 @@
 	<assets path="assets/fonts" rename="fonts" embed="true"/>
 	<assets path="assets/shaders" rename="shaders"embed="true" />
 	
+	<template path="index.html" if="html5" />
+	
 </project>

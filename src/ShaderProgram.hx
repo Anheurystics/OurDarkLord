@@ -21,7 +21,7 @@ class ShaderProgram
 	
 	var vertex: GLShader;
 	var fragment: GLShader;
-	var program: GLProgram;
+	var unit: GLProgram;
 	
 	var uniformLocations: Map<String, GLUniformLocation>;
 	var attribLocations: Map<String, Int>;
@@ -57,7 +57,7 @@ class ShaderProgram
 		fragSrc = StringTools.replace(fragSrc, "bgra", "rgba");
 		#end
 		
-		program = GL.createProgram();
+		unit = GL.createProgram();
 		
 		vertex = GL.createShader(GL.VERTEX_SHADER);
 		GL.shaderSource(vertex, vertSrc);
@@ -75,24 +75,24 @@ class ShaderProgram
 			trace("FRAGMENT SHADER (" + fragName + "): " + GL.getShaderInfoLog(fragment));
 		}
 		
-		GL.attachShader(program, vertex);
-		GL.attachShader(program, fragment);
-		GL.linkProgram(program);
-		if (GL.getProgramParameter(program, GL.LINK_STATUS) != 1)
+		GL.attachShader(unit, vertex);
+		GL.attachShader(unit, fragment);
+		GL.linkProgram(unit);
+		if (GL.getProgramParameter(unit, GL.LINK_STATUS) != 1)
 		{
-			trace(GL.getProgramInfoLog(program));
+			trace(GL.getProgramInfoLog(unit));
 		}
 	}
 	
 	public function bind(): Void
 	{
-		GL.useProgram(program);
+		GL.useProgram(unit);
 	}
 	
 	public function uniform(name: String): GLUniformLocation
 	{
 		if (uniformLocations.exists(name)) return uniformLocations.get(name);
-		var loc: GLUniformLocation = GL.getUniformLocation(program, name);
+		var loc: GLUniformLocation = GL.getUniformLocation(unit, name);
 		uniformLocations.set(name, loc);
 		return loc;
 	}
@@ -100,7 +100,7 @@ class ShaderProgram
 	public function attribLocation(name: String): Int
 	{
 		if (attribLocations.exists(name)) return attribLocations.get(name);
-		var loc: Int = GL.getAttribLocation(program, name);
+		var loc: Int = GL.getAttribLocation(unit, name);
 		attribLocations.set(name, loc);
 		return loc;		
 	}

@@ -70,7 +70,7 @@ class Renderer
 	public function uploadTexture(tex: Texture, unit: Int = GL.TEXTURE0)
 	{
 		GL.activeTexture(unit);
-		GL.bindTexture(GL.TEXTURE_2D, tex.tex);
+		GL.bindTexture(GL.TEXTURE_2D, tex.unit);
 	}
 	
 	public function uploadMesh(mesh: Mesh): Void
