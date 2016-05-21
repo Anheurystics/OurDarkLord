@@ -48,6 +48,7 @@ class Game extends OpenGLView
 	
 	var colorWhite: Float32Array = new Float32Array([1.0, 1.0, 1.0]);
 	var colorRed: Float32Array = new Float32Array([1.0, 0.2, 0.2]);
+	var colorGray: Float32Array = new Float32Array([0.3, 0.3, 0.3]);
 	
 	var viewports: Array<Array<Rectangle>> = [
 		[new Rectangle(0, 0, 1, 1)],
@@ -87,7 +88,7 @@ class Game extends OpenGLView
 		desertMap = new MapData("desert", "graphics/skybox_sunset.png", 128, 20.0, "graphics/cobble.png", 25);
 		gameInfo.bounds = desertMap.fieldDimension;	
 		
-		circle = new MagicCircle(0, 0, 4);
+		circle = new MagicCircle(0, 0, 2);
 		
 		players = new Array();
 		var angleDiff: Float = Math.PI / controls.length;
@@ -355,7 +356,8 @@ class Game extends OpenGLView
 			{
 				player.numberCorrectItems += 1;
 			}
-			renderer.uniformf("alpha", onCircle ? 1.0: .25);
+			renderer.uniformf("alpha", onCircle ? 1.0: 0.5);
+			renderer.uniformfv("tint", onCircle ? colorWhite : colorGray);
 			renderer.uploadTexture(TextureManager.get(player.goalRelics[i]));
 			renderer.renderMesh(mat);
 			
@@ -382,18 +384,18 @@ class Game extends OpenGLView
 		renderer.uniformf("alpha", 1.0);
 		renderer.uniformfv("tint", colorWhite);
 		
-		
 		renderer.uploadTexture(TextureManager.get("stamina"));
-		mat.identity().scale(2 * player.stamina, 30, 1).translate(player.stamina + 70, 100, 0);
+		mat.identity().scale(2 * player.stamina, 20, 1).translate(player.stamina + 30, 100, 0);
 		renderer.renderMesh(mat);
 		
 		renderer.uploadTexture(TextureManager.get("summon"));
-		mat.identity().scale(20 * player.summonLength, 30, 1).translate((player.summonLength * 10) + 30, 150, 0);
+		mat.identity().scale(20 * player.summonLength, 20, 1).translate((player.summonLength * 10) + 30, 140, 0);
 		renderer.renderMesh(mat);
-		
+		/*
 		renderer.uploadTexture(TextureManager.get("circle_1"));
 		mat.identity().scale(40, 40, 1).translate(25, 150, 0);
 		renderer.renderMesh(mat);
+		*/
 	}
 	
 	function updateScene(delta: Float)

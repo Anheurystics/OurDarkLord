@@ -12,7 +12,6 @@ class GamepadInput
 	static var bindings: Map<String, String> = new Map();
 	static var axes: Map<String, Float> = new Map();
 
-	static var pointer: Int = 0;
 	static var numConnected: Int = 0;
 	static var connectedPads: Array<Gamepad> = [null, null, null, null];
 	
@@ -30,15 +29,16 @@ class GamepadInput
 	}
 
 	static function addPad(pad: Gamepad)
-	{
+	{		
 		if (numConnected < 4)
-		{				
+		{
+			var pointer: Int = 0;
+			
 			while (true)
 			{
 				if (connectedPads[pointer] == null)
 				{
 					connectedPads[pointer] = pad;
-					trace("Pad added: " + pad.name);
 					break;
 				}
 				
@@ -50,6 +50,8 @@ class GamepadInput
 			
 			pad.onButtonDown.add(function(button: GamepadButton): Void
 			{
+				down.set("ANY", true);
+				down.set(button.toString(), true);
 				down.set(findPadIndex(pad) + "_" + button.toString(), true);
 				down.set(findPadIndex(pad) + "_ANY", true);
 			});
@@ -61,12 +63,17 @@ class GamepadInput
 				lastUp.set(index + "_" + button.toString(), 0);
 				down.set(index + "_ANY", false);
 				lastUp.set(index + "_ANY", 0);
+				down.set("ANY", false);
+				lastUp.set("ANY", 0);
+				down.set(button.toString(), true);
+				lastUp.set(button.toString(), 0);
 			});				
 			
 			pad.onAxisMove.add(function(axis: GamepadAxis, value: Float): Void
 			{
 				var index: Int = findPadIndex(pad);
 				axes.set(index + axis.toString(), value);	
+				axes.set(axis.toString(), value);
 			});
 			
 			pad.onDisconnect.add(function(): Void
@@ -78,6 +85,7 @@ class GamepadInput
 						connectedPads[i] = null;
 						numConnected -= 1;
 						pointer = 0;
+						break;
 					}
 				}
 			});

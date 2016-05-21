@@ -25,7 +25,7 @@ class Mat4 implements Mat
 		_matrix.appendTranslation(x, y, z);
 		return this;
 	}
-	
+
 	public function rotate(degrees: Float, axis: Vector3D, pivotPoint: Vector3D = null): Mat4
 	{
 		_matrix.appendRotation(degrees, axis, pivotPoint);

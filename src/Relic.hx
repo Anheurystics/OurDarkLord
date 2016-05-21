@@ -21,7 +21,7 @@ class Relic extends Entity
 		super(_x, _z);
 		
 		sprite = Billboard.create(Billboard.STATIC);
-		sprite.xScale = sprite.yScale = 0.4;
+		sprite.xScale = sprite.yScale = 0.5;
 		
 		sprite.y = -0.3;
 		type = _type;

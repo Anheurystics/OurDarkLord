@@ -77,7 +77,7 @@ class Camera
 	}
 	
 	public function getView(): Mat4
-	{
+	{		
 		_view.lookAt(position, position.add(front), up);
 		
 		return _view;

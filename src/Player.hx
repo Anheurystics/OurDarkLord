@@ -30,6 +30,10 @@ class Player extends Entity
 	
 	public var name: String;
 	
+	public var r: Float = 1.0;
+	public var g: Float = 1.0;
+	public var b: Float = 1.0;
+	
 	var controller: PlayerController;
 	
 	public function new(_name: String, _x: Float = 0,  _z: Float = 0, _lookAngle: Float = 0, _controller: PlayerController) 

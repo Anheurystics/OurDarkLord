@@ -36,6 +36,9 @@ class Billboard
 	public var xScale: Float;
 	public var yScale: Float;
 	public var lookAt: Vector3D;
+	public var r: Float = 1;
+	public var g: Float = 1;
+	public var b: Float = 1;
 	
 	public var angleOffset: Float = 0;
 	
@@ -133,7 +136,7 @@ class Billboard
 	}
 	
 	public function bind(renderer: Renderer): Void
-	{
+	{		
 		lookAt = Camera.current.position;
 		var diff1: Float = Math.atan2(z - lookAt.z, x -  lookAt.x);
 		diff1 = Utils.toDeg(diff1) - angleOffset;
@@ -208,6 +211,7 @@ class Billboard
 			renderer.uniformf("tile", widthRatio, heightRatio);			
 		}
 		
+		renderer.uniformf("tint", r, g, b);
 		matrix.identity().scale(xScale, yScale, 0).rotate(Std.int(Utils.toDeg(Math.atan2(lookAt.x - x, lookAt.z - z)) / 5) * 5, Vector3D.Y_AXIS).translate(x, y, z);
 		renderer.uniformMatrix("model", matrix);
 	}
