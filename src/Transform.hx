@@ -1,4 +1,5 @@
 package;
+
 import openfl.geom.Vector3D;
 
 class Transform

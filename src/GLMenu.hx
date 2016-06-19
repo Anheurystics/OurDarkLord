@@ -1,14 +1,13 @@
 package;
 
-import flash.text.Font;
 import openfl.Assets;
 import openfl.Lib;
 import openfl.display.BitmapData;
 import openfl.display.OpenGLView;
-import openfl.events.Event;
 import openfl.geom.Rectangle;
 import openfl.geom.Vector3D;
 import openfl.gl.GL;
+import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;

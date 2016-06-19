@@ -1,7 +1,6 @@
 package;
 
 import openfl.events.KeyboardEvent;
-import openfl.ui.Keyboard;
 
 class KeyboardInput
 {	

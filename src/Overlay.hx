@@ -1,9 +1,8 @@
 package;
 
 import openfl.Assets;
-import openfl.display.FPS;
-import openfl.display.Sprite;
 import openfl.Lib;
+import openfl.display.Sprite;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;

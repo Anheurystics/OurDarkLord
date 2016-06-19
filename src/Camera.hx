@@ -1,9 +1,7 @@
 package;
-import haxe.ds.Vector;
+
 import openfl.Lib;
-import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
-import openfl.utils.Float32Array;
 
 class Camera
 {

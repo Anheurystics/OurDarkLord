@@ -3,7 +3,6 @@ package;
 import openfl.Lib;
 import openfl.display.OpenGLView;
 import openfl.events.Event;
-import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.geom.Vector3D;
 import openfl.gl.GL;
@@ -167,24 +166,7 @@ class Game extends OpenGLView
 		simpleProgram = new ShaderProgram("simple", "simple");
 		skyboxProgram = new ShaderProgram("skybox", "skybox");
 		overlayProgram = new ShaderProgram("overlay", "overlay");
-		
-		TextureManager.load("cobble", "graphics/cobble.png");
-		
-		TextureManager.load("black_candle", 	"graphics/black_candle.png");
-		TextureManager.load("suggestive_book", 	"graphics/suggestive_book.png");
-		TextureManager.load("donut", 			"graphics/donut.png");
-		TextureManager.load("dummy", 			"graphics/dummy.png");
-		TextureManager.load("moms_spaghetti", 	"graphics/moms_spaghetti.png");
-		TextureManager.load("rabbit", 			"graphics/rabbit.png");
-		TextureManager.load("small_loan", 		"graphics/small_loan.png");
-		TextureManager.load("spork", 			"graphics/spork.png");
-		
-		TextureManager.load("cultist_sheet", 	"graphics/cultist_sheet.png");
-		
-		TextureManager.load("circle_1", 		"graphics/circle_1.png");
-		
-		TextureManager.load("stamina",			"graphics/stamina.png");
-		TextureManager.load("summon",			"graphics/summon.png");
+
 		desertMap.load();
 		
 		quadMesh = new Mesh(Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);

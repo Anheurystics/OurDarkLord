@@ -1,4 +1,5 @@
 package;
+
 import openfl.geom.Rectangle;
 
 typedef GameInfo = 

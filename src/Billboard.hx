@@ -1,10 +1,6 @@
 package;
 
-import openfl.geom.Matrix3D;
-import openfl.geom.Transform;
 import openfl.geom.Vector3D;
-import openfl.gl.GL;
-import openfl.utils.Float32Array;
 
 typedef Sequence =
 {

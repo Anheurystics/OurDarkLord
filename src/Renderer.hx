@@ -1,11 +1,9 @@
 package;
-import haxe.macro.Expr.Var;
-import lime.utils.Int32Array;
+
 import openfl.gl.GL;
-import openfl.gl.GLBuffer;
 import openfl.gl.GLUniformLocation;
 import openfl.utils.Float32Array;
-import openfl.utils.Int16Array;
+import openfl.utils.Int32Array;
 
 typedef Attrib = 
 {

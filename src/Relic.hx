@@ -1,5 +1,4 @@
 package;
-import openfl.Lib;
 
 class Relic extends Entity
 {
