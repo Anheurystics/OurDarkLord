@@ -149,12 +149,7 @@ class Game extends OpenGLView
 		Lib.current.stage.addEventListener(Event.RESIZE, resizeCallback);
 		
 		overlay = new Overlay();
-		
-		#if mobile
-		Lib.current.stage.addEventListener(OpenGLView.CONTEXT_LOST, contextHandler);
-		Lib.current.stage.addEventListener(OpenGLView.CONTEXT_RESTORED, contextHandler);
-		#end		
-		
+
 		render = glRender;
 		
 		GL.enable(GL.DEPTH_TEST);
