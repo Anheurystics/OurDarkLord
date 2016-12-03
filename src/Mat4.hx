@@ -1,5 +1,6 @@
 package;
 
+import openfl.Vector;
 import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
 import openfl.utils.Float32Array;
@@ -53,12 +54,12 @@ class Mat4 implements Mat
 		var f: Float = 1.0 / Math.tan(Utils.toRad(fov) / 2);
 		var nf: Float = 1 / (near - far);
 		
-		_matrix.rawData = [
+		_matrix.rawData = Vector.ofArray([
 			f / aspect, 0, 0, 0,
 			0, f, 0, 0,
 			0, 0, (far + near) * nf, -1,
 			0, 0, (2 * far * near) * nf, 0
-		];
+		]);
 		
 		return this;
 	}
@@ -69,7 +70,11 @@ class Mat4 implements Mat
 		var sy = 1.0 / (y1 - y0);
 		var sz = 1.0 / (zFar - zNear);
 		
-		_matrix.rawData = [ 2.0 * sx, 0, 0, 0, 0, 2.0 * sy, 0, 0, 0, 0, -2.0 * sz, 0, -(x0 + x1) * sx, -(y0 + y1) * sy, -(zNear + zFar) * sz, 1 ];			
+		_matrix.rawData = Vector.ofArray([ 
+			2.0 * sx, 0, 0, 0, 
+			0, 2.0 * sy, 0, 0, 
+			0, 0, -2.0 * sz, 0, 
+			-(x0 + x1) * sx, -(y0 + y1) * sy, -(zNear + zFar) * sz, 1 ]);			
 	
 		return this;
 	}
@@ -90,13 +95,12 @@ class Mat4 implements Mat
 		X.normalize();
 		Y.normalize();
 		
-		_matrix.rawData = 
-			[
+		_matrix.rawData = Vector.ofArray([
 				X.x, Y.x, Z.x, 0,
 				X.y, Y.y, Z.y, 0,
 				X.z, Y.z, Z.z, 0,
 				-X.dotProduct(position), -Y.dotProduct(position), -Z.dotProduct(position), 1
-			];
+			]);
 			
 		return this;
 	}

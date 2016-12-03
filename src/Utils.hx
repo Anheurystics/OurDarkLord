@@ -1,5 +1,6 @@
 package;
 
+import openfl.Vector;
 import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
 
@@ -60,13 +61,12 @@ class Utils
 		X.normalize();
 		Y.normalize();
 		
-		return new Matrix3D(
-			[
+		return new Matrix3D(Vector.ofArray([
 				X.x, Y.x, Z.x, 0,
 				X.y, Y.y, Z.y, 0,
 				X.z, Y.z, Z.z, 0,
 				-X.dotProduct(position), -Y.dotProduct(position), -Z.dotProduct(position), 1
-			]
+			])
 		);		
 	}
 	
@@ -77,12 +77,12 @@ class Utils
 		var f: Float = 1.0 / Math.tan(Utils.toRad(fov) / 2);
 		var nf: Float = 1 / (near - far);
 		
-		matrix.rawData = [
+		matrix.rawData = Vector.ofArray([
 			f / aspect, 0, 0, 0,
 			0, f, 0, 0,
 			0, 0, (far + near) * nf, -1,
 			0, 0, (2 * far * near) * nf, 0
-		];
+		]);
 		
 		return matrix;
 	}
