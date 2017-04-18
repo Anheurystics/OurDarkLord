@@ -27,11 +27,11 @@ class Mesh
 		indexBuffer = GL.createBuffer();
 		
 		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(vertices), GL.STATIC_DRAW);
+		GL.bufferData(GL.ARRAY_BUFFER, vertices.length * 4, new Float32Array(vertices), GL.STATIC_DRAW);
 		GL.bindBuffer(GL.ARRAY_BUFFER, null);
 		
 		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(indices), GL.STATIC_DRAW);
+		GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices.length * 2, new Int16Array(indices), GL.STATIC_DRAW);
 		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
 		
 		this.attribNames = attribNames;

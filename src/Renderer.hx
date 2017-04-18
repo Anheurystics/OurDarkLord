@@ -122,18 +122,18 @@ class Renderer
 		else 					GL.uniform4f(loc, d1, d2, d3, d4);
 	}
 	
-	var uniformFV: Array<GLUniformLocation->Float32Array->Void> = [GL.uniform1fv, GL.uniform2fv, GL.uniform3fv, GL.uniform4fv];
+	var uniformFV: Array<Dynamic> = [GL.uniform1fv, GL.uniform2fv, GL.uniform3fv, GL.uniform4fv];
 	public function uniformfv(name: String, arr: Float32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformFV[arr.length - 1](loc, arr);
+		uniformFV[arr.length - 1](loc, arr.length, arr#if(js && html5 && display), 0#end);
 	}
 	
-	var uniformIV: Array<GLUniformLocation->Int32Array->Void> = [GL.uniform1iv, GL.uniform2iv, GL.uniform3iv, GL.uniform4iv];
+	var uniformIV: Array<Dynamic> = [GL.uniform1iv, GL.uniform2iv, GL.uniform3iv, GL.uniform4iv];
 	public function uniformiv(name: String, arr: Int32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformIV[arr.length - 1](loc, arr);
+		uniformIV[arr.length - 1](loc, arr.length, arr#if(js && html5 && display), 0#end);
 	}
 	
 	public function uniformi(name: String, d1: Int, d2: Int = null, d3: Int = null, d4: Int = null)
@@ -149,7 +149,7 @@ class Renderer
 	{
 		if (mat.type() == 4)
 		{
-			GL.uniformMatrix4fv(program.uniform(name), false, mat.array());
+			GL.uniformMatrix4fv(program.uniform(name), 1, false, mat.array());
 		}
 	}
-}
+}	
