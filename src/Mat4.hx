@@ -3,7 +3,7 @@ package;
 import openfl.Vector;
 import openfl.geom.Matrix3D;
 import openfl.geom.Vector3D;
-import openfl.utils.Float32Array;
+import lime.utils.Float32Array;
 
 class Mat4 implements Mat
 {

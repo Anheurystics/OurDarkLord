@@ -1,9 +1,9 @@
 package;
 
-import openfl.gl.GL;
-import openfl.gl.GLBuffer;
-import openfl.utils.Float32Array;
-import openfl.utils.Int16Array;
+import lime.graphics.opengl.WebGLContext;
+import lime.graphics.opengl.GLBuffer;
+import lime.utils.Float32Array;
+import lime.utils.Int16Array;
 
 class Mesh
 {	
@@ -18,21 +18,21 @@ class Mesh
 	
 	public var totalAttribSize: Int;
 
-	public function new(vertices: Array<Float>, indices: Array<Int>, attribNames: Array<String>, attribSizes: Array<Int>) 
+	public function new(gl: WebGLContext, vertices: Array<Float>, indices: Array<Int>, attribNames: Array<String>, attribSizes: Array<Int>) 
 	{		
 		nVertices = vertices.length;
 		nIndices = indices.length;
 		
-		vertexBuffer = GL.createBuffer();
-		indexBuffer = GL.createBuffer();
+		vertexBuffer = gl.createBuffer();
+		indexBuffer = gl.createBuffer();
 		
-		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		GL.bufferData(GL.ARRAY_BUFFER, vertices.length * 4, new Float32Array(vertices), GL.STATIC_DRAW);
-		GL.bindBuffer(GL.ARRAY_BUFFER, null);
+		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		
-		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices.length * 2, new Int16Array(indices), GL.STATIC_DRAW);
-		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(indices), gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 		
 		this.attribNames = attribNames;
 		this.attribSizes = attribSizes;

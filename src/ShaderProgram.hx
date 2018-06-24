@@ -1,10 +1,10 @@
 package;
 
 import openfl.Assets;
-import openfl.gl.GL;
-import openfl.gl.GLProgram;
-import openfl.gl.GLShader;
-import openfl.gl.GLUniformLocation;
+import lime.graphics.opengl.WebGLContext;
+import lime.graphics.opengl.GLProgram;
+import lime.graphics.opengl.GLShader;
+import lime.graphics.opengl.GLUniformLocation;
 
 class ShaderProgram
 {
@@ -26,9 +26,12 @@ class ShaderProgram
 	
 	var vertName: String;
 	var fragName: String;
+
+	var gl: WebGLContext;
 	
-	public function new(_vertName: String, _fragName: String) 
+	public function new(_gl: WebGLContext, _vertName: String, _fragName: String) 
 	{
+		gl = _gl;
 		vertName = _vertName;
 		fragName = _fragName;
 		
@@ -55,42 +58,42 @@ class ShaderProgram
 		fragSrc = StringTools.replace(fragSrc, "bgra", "rgba");
 		#end
 		
-		unit = GL.createProgram();
+		unit = gl.createProgram();
 		
-		vertex = GL.createShader(GL.VERTEX_SHADER);
-		GL.shaderSource(vertex, vertSrc);
-		GL.compileShader(vertex);
-		if (GL.getShaderParameter(vertex, GL.COMPILE_STATUS) != 1)
+		vertex = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertex, vertSrc);
+		gl.compileShader(vertex);
+		if (gl.getShaderParameter(vertex, gl.COMPILE_STATUS) != 1)
 		{
-			trace("VERTEX SHADER (" + vertName + "): " + GL.getShaderInfoLog(vertex));
+			trace("VERTEX SHADER (" + vertName + "): " + gl.getShaderInfoLog(vertex));
 		}
 
-		fragment = GL.createShader(GL.FRAGMENT_SHADER);
-		GL.shaderSource(fragment, fragSrc);
-		GL.compileShader(fragment);
-		if (GL.getShaderParameter(fragment, GL.COMPILE_STATUS) != 1)
+		fragment = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragment, fragSrc);
+		gl.compileShader(fragment);
+		if (gl.getShaderParameter(fragment, gl.COMPILE_STATUS) != 1)
 		{
-			trace("FRAGMENT SHADER (" + fragName + "): " + GL.getShaderInfoLog(fragment));
+			trace("FRAGMENT SHADER (" + fragName + "): " + gl.getShaderInfoLog(fragment));
 		}
 		
-		GL.attachShader(unit, vertex);
-		GL.attachShader(unit, fragment);
-		GL.linkProgram(unit);
-		if (GL.getProgramParameter(unit, GL.LINK_STATUS) != 1)
+		gl.attachShader(unit, vertex);
+		gl.attachShader(unit, fragment);
+		gl.linkProgram(unit);
+		if (gl.getProgramParameter(unit, gl.LINK_STATUS) != 1)
 		{
-			trace(GL.getProgramInfoLog(unit));
+			trace(gl.getProgramInfoLog(unit));
 		}
 	}
 	
 	public function bind(): Void
 	{
-		GL.useProgram(unit);
+		gl.useProgram(unit);
 	}
 	
 	public function uniform(name: String): GLUniformLocation
 	{
 		if (uniformLocations.exists(name)) return uniformLocations.get(name);
-		var loc: GLUniformLocation = GL.getUniformLocation(unit, name);
+		var loc: GLUniformLocation = gl.getUniformLocation(unit, name);
 		uniformLocations.set(name, loc);
 		return loc;
 	}
@@ -98,13 +101,13 @@ class ShaderProgram
 	public function attribLocation(name: String): Int
 	{
 		if (attribLocations.exists(name)) return attribLocations.get(name);
-		var loc: Int = GL.getAttribLocation(unit, name);
+		var loc: Int = gl.getAttribLocation(unit, name);
 		attribLocations.set(name, loc);
 		return loc;		
 	}
 	
 	public function unbind(): Void
 	{
-		GL.useProgram(null);
+		gl.useProgram(null);
 	}
 }

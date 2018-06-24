@@ -3,14 +3,16 @@ package;
 import openfl.Assets;
 import openfl.Lib;
 import openfl.display.BitmapData;
-import openfl.display.OpenGLView;
-import openfl.geom.Rectangle;
+import openfl.display.OpenGLRenderer;
+import openfl.display.Sprite;
+import openfl.events.Event;
+import openfl.events.RenderEvent;
 import openfl.geom.Vector3D;
-import openfl.gl.GL;
 import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
+import lime.graphics.opengl.WebGLContext;
 
 typedef CamTransform = {
 	var x: Float;
@@ -20,7 +22,7 @@ typedef CamTransform = {
 	var yaw: Float;
 };
 
-class GLMenu extends OpenGLView
+class GLMenu extends Sprite 
 {
 	static inline var STATE_MAIN: Int = 0;
 	static inline var STATE_LOBBY: Int = 1;
@@ -86,11 +88,16 @@ class GLMenu extends OpenGLView
 		menuState = STATE_MAIN;
 		
 		prev = Lib.getTimer();
-		render = glRender;
-		
-		renderer = new Renderer();
-		simpleProgram = new ShaderProgram("simple", "simple");
-		quad = new Mesh(Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
+
+		addEventListener(Event.ENTER_FRAME, enterFrame);
+		addEventListener(RenderEvent.RENDER_OPENGL, glRender);
+	}
+
+	function glInit(gl: WebGLContext)
+	{
+		renderer = new Renderer(gl);
+		simpleProgram = new ShaderProgram(gl, "simple", "simple");
+		quad = new Mesh(gl, Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
 		cam = new Camera();
 		
 		mainCameraTransform = {
@@ -139,27 +146,27 @@ class GLMenu extends OpenGLView
 		var format: TextFormat = new TextFormat(straightToHellSinner.fontName, 96, 0xCC0000);
 		format.align = TextFormatAlign.CENTER;
 		
-		generateTextureFromText("Our Dark Lord\nis\nBetter Than Yours", format, "menuTitle");
+		generateTextureFromText(gl, "Our Dark Lord\nis\nBetter Than Yours", format, "menuTitle");
 		
 		var titleTex: Texture = TextureManager.get("menuTitle");
 		titleMatrix = new Mat4().identity().rotate( -90, Vector3D.Y_AXIS).scale(1.0, 2.0, 2.0 * titleTex.width / titleTex.height).translate( -0.5, 2.0, 0);
 		
-		generateTextureFromText("Keyboard", format, "lobbyKeyboard");
-		generateTextureFromText("Gamepad 1", format, "lobbyPad1");
-		generateTextureFromText("Gamepad 2", format, "lobbyPad2");
-		generateTextureFromText("Gamepad 3", format, "lobbyPad3");
-		generateTextureFromText("Gamepad 4", format, "lobbyPad4");
+		generateTextureFromText(gl, "Keyboard", format, "lobbyKeyboard");
+		generateTextureFromText(gl, "Gamepad 1", format, "lobbyPad1");
+		generateTextureFromText(gl, "Gamepad 2", format, "lobbyPad2");
+		generateTextureFromText(gl, "Gamepad 3", format, "lobbyPad3");
+		generateTextureFromText(gl, "Gamepad 4", format, "lobbyPad4");
 		
 		format.color = 0;
-		generateTextureFromText("Start", format, "menuStart");
-		generateTextureFromText("Options", format, "menuOptions");
-		generateTextureFromText("Back", format, "menuBack");
-		generateTextureFromText("Exit", format, "menuExit");
+		generateTextureFromText(gl, "Start", format, "menuStart");
+		generateTextureFromText(gl, "Options", format, "menuOptions");
+		generateTextureFromText(gl, "Back", format, "menuBack");
+		generateTextureFromText(gl, "Exit", format, "menuExit");
 		
 		for (i in 0...countdownDuration)
 		{
 			var s: Int = i + 1;
-			generateTextureFromText("Starting in " + s + "...", format, "countdown" + s);
+			generateTextureFromText(gl, "Starting in " + s + "...", format, "countdown" + s);
 		}
 		
 		var startTex: Texture = TextureManager.get("menuStart");
@@ -196,6 +203,7 @@ class GLMenu extends OpenGLView
 		renderer.uniformf("fogDistance", 6);
 		renderer.uniformf("fogRate", 1);
 		renderer.uniformf("fogColor", 0.1, 0.1, 0.1, 1.0);
+
 	}
 	
 	function changeArea(options: String): Void
@@ -256,7 +264,7 @@ class GLMenu extends OpenGLView
 		//TODO Angular tween
 	}
 
-	function generateTextureFromText(text: String, format: TextFormat, texName: String)
+	function generateTextureFromText(gl: WebGLContext, text: String, format: TextFormat, texName: String)
 	{
 		var field: TextField = new TextField();
 		
@@ -269,7 +277,7 @@ class GLMenu extends OpenGLView
 		var data: BitmapData = new BitmapData(Math.ceil(field.width), Math.ceil(field.height), true, 0);
 		data.draw(field, null, null, null, null, true);
 		
-		TextureManager.load(texName, data, GL.LINEAR);	
+		TextureManager.load(texName, data, gl.LINEAR);	
 	}
 	
 	function placeCultist(angle: Float, x: Float = 0, z: Float = 0): Billboard
@@ -281,10 +289,23 @@ class GLMenu extends OpenGLView
 		
 		return cultist;
 	}
+
+	function enterFrame(_)
+	{
+		Lib.current.stage.invalidate();
+	}
 	
 	var prev: Int;
-	function glRender(rect: Rectangle): Void
+	var initialized: Bool = false;
+	function glRender(event: RenderEvent): Void
 	{		
+		var gl: WebGLContext = cast(cast(event.renderer, OpenGLRenderer).gl);
+		if(!initialized) 
+		{
+			glInit(gl);
+			initialized = true;
+		}
+
 		var delta: Float = (Lib.getTimer() - prev) / 1000;
 		prev = Lib.getTimer();
 		
@@ -449,8 +470,8 @@ class GLMenu extends OpenGLView
 		
 		cam.update();
 		
-		renderer.depthTest(GL.LEQUAL);
-		renderer.blend(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+		renderer.depthTest(gl.LEQUAL);
+		renderer.blend(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		renderer.clear(0.1, 0.1, 0.1);
 		
 		renderer.uploadProgram(simpleProgram);
@@ -462,15 +483,15 @@ class GLMenu extends OpenGLView
 		renderer.uploadMesh(quad);
 		var mat: Mat4 = new Mat4();		
 		renderer.uniformf("tile", 60, 60);
-		TextureManager.get("cobble").bind(GL.TEXTURE0);
+		TextureManager.get("cobble").bind(gl.TEXTURE0);
 		renderer.renderMesh(mat.identity().rotate(-90, Vector3D.X_AXIS).scale(30.0, 1.0, 30.0).translate(0, -0.5, 0));	
 		
 		renderer.uniformf("tile", 1, 1);
-		TextureManager.get("circle_1").bind(GL.TEXTURE0);
+		TextureManager.get("circle_1").bind(gl.TEXTURE0);
 		renderer.renderMesh(mat.identity().rotate( -90, Vector3D.X_AXIS).scale(2.0, 1.0, 2.0).translate(0, -0.49, 0));
 		renderer.renderMesh(mat.identity().rotate( -90, Vector3D.X_AXIS).scale(2.0, 1.0, 2.0).translate(-5.0, -0.49, -2.5));
 		
-		TextureManager.get("ready").bind(GL.TEXTURE0);
+		TextureManager.get("ready").bind(gl.TEXTURE0);
 		for (i in 0...4)
 		{
 			if (ready[i] && joinedPlayers[i] != EMPTY_SLOT)
@@ -480,7 +501,7 @@ class GLMenu extends OpenGLView
 			}
 		}
 		
-		TextureManager.get("cultist_sheet").bind(GL.TEXTURE0);
+		TextureManager.get("cultist_sheet").bind(gl.TEXTURE0);
 		for (cultist in menuCultists)
 		{
 			cultist.bind(renderer);
@@ -505,25 +526,25 @@ class GLMenu extends OpenGLView
 		{
 			if (joinedPlayers[i] != EMPTY_SLOT)
 			{
-				TextureManager.get(getInputType(joinedPlayers[i])).bind(GL.TEXTURE0);
+				TextureManager.get(getInputType(joinedPlayers[i])).bind(gl.TEXTURE0);
 				renderer.renderMesh(floatTextMatrix[i]);
 			}
 		}
 		
-		TextureManager.get(menuItemRelicMap[selectedOption]).bind(GL.TEXTURE0);
+		TextureManager.get(menuItemRelicMap[selectedOption]).bind(gl.TEXTURE0);
 		renderer.renderMesh(relicMatrix);
 		
 		if (!transitioning)
 		{
-			TextureManager.get("menuTitle").bind(GL.TEXTURE0);
+			TextureManager.get("menuTitle").bind(gl.TEXTURE0);
 			renderer.renderMesh(titleMatrix);
 			
-			TextureManager.get("menu" + selectedOption).bind(GL.TEXTURE0);
+			TextureManager.get("menu" + selectedOption).bind(gl.TEXTURE0);
 			renderer.renderMesh(menuItemMatrixMap[selectedOption]);
 			
 			if (countingDown && countdown > 0)
 			{
-				TextureManager.get("countdown" + Math.ceil(countdown)).bind(GL.TEXTURE0);
+				TextureManager.get("countdown" + Math.ceil(countdown)).bind(gl.TEXTURE0);
 				renderer.renderMesh(countdownMatrix);
 			}
 		}
@@ -618,8 +639,8 @@ class GLMenu extends OpenGLView
 				c.push(player);
 			}
 		}
-		
-		parent.addChild(new Game(c));
+		var game = new Game(c);
+		parent.addChild(game);
 		parent.removeChild(this);
 	}
 }

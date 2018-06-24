@@ -4,8 +4,8 @@ import openfl.Assets;
 import openfl.display.BitmapData;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-import openfl.gl.GL;
-import openfl.gl.GLTexture;
+import lime.graphics.opengl.GL;
+import lime.graphics.opengl.GLTexture;
 
 class MapData
 {

@@ -2,9 +2,9 @@ package;
 
 import openfl.Assets;
 import openfl.display.BitmapData;
-import openfl.gl.GL;
-import openfl.gl.GLTexture;
-import openfl.utils.UInt8Array;
+import lime.graphics.opengl.GL;
+import lime.graphics.opengl.GLTexture;
+import lime.utils.UInt8Array;
 
 class Texture
 {

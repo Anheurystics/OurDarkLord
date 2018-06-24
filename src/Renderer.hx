@@ -1,9 +1,9 @@
 package;
 
-import openfl.gl.GL;
-import openfl.gl.GLUniformLocation;
-import openfl.utils.Float32Array;
-import openfl.utils.Int32Array;
+import lime.graphics.opengl.WebGLContext;
+import lime.graphics.opengl.GLUniformLocation;
+import lime.utils.Float32Array;
+import lime.utils.Int32Array;
 
 typedef Attrib = 
 {
@@ -17,26 +17,35 @@ class Renderer
 
 	var nVertices: Int;
 	var nIndices: Int;
+
+	var uniformFV: Array<GLUniformLocation -> Float32Array -> Void>;
+	var uniformIV: Array<GLUniformLocation -> Int32Array -> Void>;
+
+	var gl: WebGLContext;
 	
-	public function new() 
+	public function new(gl: WebGLContext) 
 	{
+		this.gl = gl;
+
+		uniformFV = [gl.uniform1fv, gl.uniform2fv, gl.uniform3fv, gl.uniform4fv];
+		uniformIV = [gl.uniform1iv, gl.uniform2iv, gl.uniform3iv, gl.uniform4iv];
 	}
 
 	public function viewport(x: Int, y: Int, w: Int, h: Int): Void
 	{
-		GL.viewport(x, y, w, h);
+		gl.viewport(x, y, w, h);
 	}
 	
 	public function depthTest(func: Int = null): Void
 	{
 		if (func != null)
 		{
-			GL.enable(GL.DEPTH_TEST);
-			GL.depthFunc(func);
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthFunc(func);
 		}
 		else
 		{
-			GL.disable(GL.DEPTH_TEST);
+			gl.disable(gl.DEPTH_TEST);
 		}
 	}
 	
@@ -44,19 +53,19 @@ class Renderer
 	{
 		if (src != null && dest != null)
 		{
-			GL.enable(GL.BLEND);
-			GL.blendFunc(src, dest);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(src, dest);
 		}
 		else
 		{
-			GL.disable(GL.BLEND);
+			gl.disable(gl.BLEND);
 		}
 	}
 	
 	public function clear(r: Float = 0.0, g: Float = 0.0, b: Float = 0.0)
 	{
-		GL.clearColor(r, g, b, 1.0);	
-		GL.clear(GL.DEPTH_BUFFER_BIT | GL.COLOR_BUFFER_BIT);		
+		gl.clearColor(r, g, b, 1.0);	
+		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);		
 	}
 	
 	public function uploadProgram(program: ShaderProgram)
@@ -65,10 +74,11 @@ class Renderer
 		program.bind();
 	}
 	
-	public function uploadTexture(tex: Texture, unit: Int = GL.TEXTURE0)
+	public function uploadTexture(tex: Texture, unit: Int = 0)
 	{
-		GL.activeTexture(unit);
-		GL.bindTexture(GL.TEXTURE_2D, tex.unit);
+		unit = gl.TEXTURE0;
+		gl.activeTexture(unit);
+		gl.bindTexture(gl.TEXTURE_2D, tex.unit);
 	}
 	
 	public function uploadMesh(mesh: Mesh): Void
@@ -76,7 +86,7 @@ class Renderer
 		nVertices = mesh.nVertices;
 		nIndices = mesh.nIndices;
 		
-		GL.bindBuffer(GL.ARRAY_BUFFER, mesh.vertexBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
 		
 		var off: Int = 0;
 		for (i in 0...mesh.attribNames.length)
@@ -84,15 +94,15 @@ class Renderer
 			var loc: Int = program.attribLocation(mesh.attribNames[i]);
 			if (loc != -1)
 			{
-				GL.vertexAttribPointer(loc, mesh.attribSizes[i], GL.FLOAT, false, mesh.totalAttribSize * Float32Array.BYTES_PER_ELEMENT, off);
-				GL.enableVertexAttribArray(loc);
+				gl.vertexAttribPointer(loc, mesh.attribSizes[i], gl.FLOAT, false, mesh.totalAttribSize * Float32Array.BYTES_PER_ELEMENT, off);
+				gl.enableVertexAttribArray(loc);
 				off += mesh.attribSizes[i] * Float32Array.BYTES_PER_ELEMENT;
 			}
 		}
 		
 		if (nIndices > 0)
 		{
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);	
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);	
 		}
 	}
 	
@@ -105,51 +115,49 @@ class Renderer
 			
 		if (nIndices > 0)
 		{
-			GL.drawElements(GL.TRIANGLES, nIndices, GL.UNSIGNED_SHORT, 0);
+			gl.drawElements(gl.TRIANGLES, nIndices, gl.UNSIGNED_SHORT, 0);
 		}
 		else
 		{
-			GL.drawArrays(GL.TRIANGLES, 0, Std.int(nVertices / 3));
+			gl.drawArrays(gl.TRIANGLES, 0, Std.int(nVertices / 3));
 		}
 	}
 	
 	public function uniformf(name: String, d1: Float, d2: Float = null, d3: Float = null, d4: Float = null)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		if (d2 == null) 		GL.uniform1f(loc, d1);
-		else if (d3 == null) 	GL.uniform2f(loc, d1, d2);
-		else if (d4 == null) 	GL.uniform3f(loc, d1, d2, d3);
-		else 					GL.uniform4f(loc, d1, d2, d3, d4);
+		if (d2 == null) 		gl.uniform1f(loc, d1);
+		else if (d3 == null) 	gl.uniform2f(loc, d1, d2);
+		else if (d4 == null) 	gl.uniform3f(loc, d1, d2, d3);
+		else 					gl.uniform4f(loc, d1, d2, d3, d4);
 	}
 	
-	var uniformFV: Array<Dynamic> = [GL.uniform1fv, GL.uniform2fv, GL.uniform3fv, GL.uniform4fv];
 	public function uniformfv(name: String, arr: Float32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformFV[arr.length - 1](loc, arr.length, arr#if(js && html5 && display), 0#end);
+		uniformFV[arr.length - 1](loc, arr);
 	}
 	
-	var uniformIV: Array<Dynamic> = [GL.uniform1iv, GL.uniform2iv, GL.uniform3iv, GL.uniform4iv];
 	public function uniformiv(name: String, arr: Int32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformIV[arr.length - 1](loc, arr.length, arr#if(js && html5 && display), 0#end);
+		uniformIV[arr.length - 1](loc, arr);
 	}
 	
 	public function uniformi(name: String, d1: Int, d2: Int = null, d3: Int = null, d4: Int = null)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		if (d2 == null) 		GL.uniform1i(loc, d1);
-		else if (d3 == null) 	GL.uniform2i(loc, d1, d2);
-		else if (d4 == null) 	GL.uniform3i(loc, d1, d2, d3);
-		else 					GL.uniform4i(loc, d1, d2, d3, d4);
+		if (d2 == null) 		gl.uniform1i(loc, d1);
+		else if (d3 == null) 	gl.uniform2i(loc, d1, d2);
+		else if (d4 == null) 	gl.uniform3i(loc, d1, d2, d3);
+		else 					gl.uniform4i(loc, d1, d2, d3, d4);
 	}
 	
 	public function uniformMatrix(name: String, mat: Mat): Void
 	{
 		if (mat.type() == 4)
 		{
-			GL.uniformMatrix4fv(program.uniform(name), 1, false, mat.array());
+			gl.uniformMatrix4fv(program.uniform(name), false, mat.array());
 		}
 	}
 }	

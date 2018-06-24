@@ -1,7 +1,7 @@
 package;
 
 import openfl.geom.Rectangle;
-import openfl.gl.GL;
+import lime.graphics.opengl.GL;
 
 class TextureManager
 {	

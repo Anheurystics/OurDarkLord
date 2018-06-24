@@ -1,15 +1,16 @@
 package;
 
 import openfl.Lib;
-import openfl.display.OpenGLView;
+import openfl.display.OpenGLRenderer;
+import openfl.display.Sprite;
 import openfl.events.Event;
+import openfl.events.RenderEvent;
 import openfl.geom.Rectangle;
 import openfl.geom.Vector3D;
-import openfl.gl.GL;
-import openfl.system.System;
-import openfl.utils.Float32Array;
+import lime.graphics.opengl.WebGLContext;
+import lime.utils.Float32Array;
 
-class Game extends OpenGLView
+class Game extends Sprite 
 {	
 	var renderer: Renderer;
 	
@@ -67,14 +68,6 @@ class Game extends OpenGLView
 	public function new(controls: Array<Int>) 
 	{
 		super();
-		
-		if (!OpenGLView.isSupported)
-		{
-			trace("OpenGL is not supported!");
-			#if (desktop)
-			System.exit(0);
-			#end
-		}
 		
 		gameInfo = {
 			players: null,
@@ -150,27 +143,9 @@ class Game extends OpenGLView
 		
 		overlay = new Overlay();
 
-		render = glRender;
-		
-		GL.enable(GL.DEPTH_TEST);
-		GL.depthFunc(GL.LEQUAL);
-		GL.depthMask(true);			
-		
-		renderer = new Renderer();
-		
-		simpleProgram = new ShaderProgram("simple", "simple");
-		skyboxProgram = new ShaderProgram("skybox", "skybox");
-		overlayProgram = new ShaderProgram("overlay", "overlay");
+		addEventListener(Event.ENTER_FRAME, enterFrame);
+		addEventListener(RenderEvent.RENDER_OPENGL, glRender);
 
-		desertMap.load();
-		
-		quadMesh = new Mesh(Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
-		skyboxMesh = new Mesh(Geometry.skyboxVertices, [], ["position"], [3]);
-		
-		model = new Mat4();
-		orthoView = new Mat4().translate(0, 0, -1);
-		
-		Lib.current.stage.addChild(overlay);
 		
 		prevUpdate = Lib.getTimer();
 		
@@ -192,18 +167,57 @@ class Game extends OpenGLView
 		
 		gameInfo.players = players;
 	}
+
+	function enterFrame(_): Void
+	{
+		Lib.current.stage.invalidate();
+	}
+
+	function glInit(gl: WebGLContext)
+	{
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.LEQUAL);
+		gl.depthMask(true);			
+			
+		renderer = new Renderer(gl);
+		
+		simpleProgram = new ShaderProgram(gl, "simple", "simple");
+		skyboxProgram = new ShaderProgram(gl, "skybox", "skybox");
+		overlayProgram = new ShaderProgram(gl, "overlay", "overlay");
+
+		desertMap.load();
+		
+		quadMesh = new Mesh(gl, Geometry.quadVertices, Geometry.quadIndices, ["position", "texCoord", "normal"], [3, 2, 3]);
+		skyboxMesh = new Mesh(gl, Geometry.skyboxVertices, [], ["position"], [3]);
+		
+		model = new Mat4();
+		orthoView = new Mat4().translate(0, 0, -1);
+		
+		Lib.current.stage.addChild(overlay);
+	}
 	
-	function glRender(rect: Rectangle): Void
+	var initialized: Bool = false;
+	function glRender(event: RenderEvent): Void
 	{		
+		var gl: WebGLContext = cast(cast(event.renderer, OpenGLRenderer).gl);
+		if(!initialized) 
+		{
+			glInit(gl);
+			initialized = true;
+		}
+
 		var delta: Float = (Lib.getTimer() - prevUpdate) / 1000;
 		prevUpdate = Lib.getTimer();
-		
+
 		updateScene(delta);
 		
-		renderer.depthTest(GL.LEQUAL);
-		renderer.blend(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+		renderer.depthTest(gl.LEQUAL);
+		renderer.blend(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+		var w: Int = Std.int(Lib.application.window.width);
+		var h: Int = Std.int(Lib.application.window.height);
 		
-		renderer.viewport(0, 0, Std.int(rect.width), Std.int(rect.height));
+		renderer.viewport(0, 0, Lib.application.window.width, Lib.application.window.height);
 		
 		renderer.clear();
 		
@@ -217,8 +231,6 @@ class Game extends OpenGLView
 		renderer.uniformf("fogColor", 0.6, 0.0, 0.0, 1.0);
 		
 		var viewportLayout: Array<Rectangle> = viewports[players.length - 1];
-		var w: Int = Std.int(rect.width);
-		var h: Int = Std.int(rect.height);
 		gameInfo.viewports = viewportLayout;
 		
 		for (i in 0...players.length)

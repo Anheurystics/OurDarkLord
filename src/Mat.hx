@@ -1,6 +1,6 @@
 package;
 
-import openfl.utils.Float32Array;
+import lime.utils.Float32Array;
 
 interface Mat 
 {
