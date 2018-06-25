@@ -487,7 +487,7 @@ class GLMenu extends Sprite
 		renderer.renderMesh(mat.identity().rotate(-90, Vector3D.X_AXIS).scale(30.0, 1.0, 30.0).translate(0, -0.5, 0));	
 		
 		renderer.uniformf("tile", 1, 1);
-		TextureManager.get("circle_1").bind(gl.TEXTURE0);
+		TextureManager.get("circle_2").bind(gl.TEXTURE0);
 		renderer.renderMesh(mat.identity().rotate( -90, Vector3D.X_AXIS).scale(2.0, 1.0, 2.0).translate(0, -0.49, 0));
 		renderer.renderMesh(mat.identity().rotate( -90, Vector3D.X_AXIS).scale(2.0, 1.0, 2.0).translate(-5.0, -0.49, -2.5));
 		

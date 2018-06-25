@@ -65,6 +65,7 @@ class Main extends Sprite
 		//Level textures
 		TextureManager.load("cobble", "graphics/cobble.png");
 		TextureManager.load("circle_1", "graphics/circle_1.png");
+		TextureManager.load("circle_2", "graphics/circle_2.png");
 		TextureManager.load("ready", "graphics/ready.png");
 		
 		//Relic textures
