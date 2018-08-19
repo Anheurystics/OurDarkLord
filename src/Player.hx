@@ -119,6 +119,69 @@ class Player extends Entity
 		sprite.z = z;
 		sprite.angleOffset = lookAngle;
 	}
+
+	public function useButton(game: GameInfo): Void
+	{
+		if (holding == null)
+		{
+			var front: Vector3D = new Vector3D(Math.cos(Utils.toRad(lookAngle)), 0, Math.sin(Utils.toRad(lookAngle)));
+			var nearest: Float = Math.POSITIVE_INFINITY;
+			var toPickUp: Relic = null;
+			for (relic in game.relics)
+			{	
+				if (relic.state == Relic.STATE_GROUND)
+				{
+					var toRelic: Vector3D = new Vector3D(x - relic.x, 0, z - relic.z);
+					var dist: Float = toRelic.normalize();
+					if (dist < pickupRange && dist < nearest)
+					{
+						var dot: Float = front.dotProduct(toRelic);
+						if (dot < -0.85) 
+						{
+							nearest = dist;
+							toPickUp = relic;
+						}							
+					}
+				}
+			}	
+			if (toPickUp != null)
+			{
+				pickupRelic(toPickUp);
+			}
+			else
+			{
+				nearest = Math.POSITIVE_INFINITY;
+				var toPickUpFrom: Player = null;
+				for (other in game.players)
+				{
+					if (other.holding != null)
+					{
+						var playerFront: Vector3D = new Vector3D(Math.cos(Utils.toRad(other.lookAngle)), 0, Math.sin(Utils.toRad(other.lookAngle)));
+						var toPlayer: Vector3D = new Vector3D(x - other.x, 0, z - other.z);
+						var dist: Float = toPlayer.normalize();
+						if (dist < pickupRange && dist < nearest)
+						{
+							var dot: Float = front.dotProduct(playerFront);
+							if (dot < -0.85)
+							{
+								nearest = dist;
+								toPickUpFrom = other;
+							}
+						}
+					}
+				}
+				if (toPickUpFrom != null)
+				{
+					holding = toPickUpFrom.holding;
+					toPickUpFrom.holding = null;
+				}
+			}
+		}
+		else
+		{
+			dropRelic();
+		}
+	}
 	
 	public function pickupRelic(relic: Relic): Void
 	{

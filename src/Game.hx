@@ -149,12 +149,11 @@ class Game extends Sprite
 		skyboxMatrix = new Mat4().scale(20, 20, 20);
 		
 		Lib.current.stage.addEventListener(Event.RESIZE, resizeCallback);
-		
+
 		overlay = new Overlay();
 
 		addEventListener(Event.ENTER_FRAME, enterFrame);
 		addEventListener(RenderEvent.RENDER_OPENGL, glRender);
-
 		
 		prevUpdate = Lib.getTimer();
 		

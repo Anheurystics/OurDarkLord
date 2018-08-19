@@ -54,7 +54,7 @@ class Main extends Sprite
 		Input.bind("menu_back_0", "BACK");
 		Input.bind("menu_left", "DPAD_LEFT");
 		Input.bind("menu_right", "DPAD_RIGHT");
-		
+
 		//Add listeners
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, KeyboardInput.keyCallback);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyboardInput.keyCallback);		

@@ -1,18 +1,59 @@
 package;
 
+import openfl.Lib;
 import openfl.geom.Vector3D;
 
 class InputController implements PlayerController
-{
+{	
 	var gamepad: String;
-	
+
+	#if desktop
+	var _player: Player;
+	var _game: GameInfo;
+	var mouseDeltaX: Float = 0;
+	#end
+
 	public function new(_gamepad: Int = -1) 
 	{
 		gamepad = _gamepad >= 0? Std.string(_gamepad) : "";
+		#if desktop
+		if(_gamepad == -1)
+		{
+			var window = Lib.application.window;
+			window.mouseLock = true;
+			window.onMouseMoveRelative.add(function(x, y) {
+				if(Math.abs(x) < 2)
+				{
+					x = 0;
+				}
+				mouseDeltaX = x / window.width;
+			});
+
+			window.onMouseDown.add(function(x, y, btn) {
+				trace(btn);
+				if(_player != null && _game != null)
+				{
+					if(btn == 0) 
+					{
+						_player.throwRelic();
+					}
+					if(btn == 2)
+					{
+						_player.useButton(_game);
+					}
+				}
+			});
+		}
+		#end
 	}
 	
 	public function update(player: Player, game: GameInfo, delta: Float): Void
 	{
+		#if desktop
+		_player = player;
+		_game = game;
+		#end
+
 		if (gamepad.length > 0)
 		{
 			var yAxis: Float = GamepadInput.axis(gamepad + "LEFT_Y");
@@ -54,65 +95,7 @@ class InputController implements PlayerController
 		
 		if (Input.isPressed(gamepad+"use"))
 		{	
-			if (player.holding == null)
-			{
-				var front: Vector3D = new Vector3D(Math.cos(Utils.toRad(player.lookAngle)), 0, Math.sin(Utils.toRad(player.lookAngle)));
-				var nearest: Float = Math.POSITIVE_INFINITY;
-				var toPickUp: Relic = null;
-				for (relic in game.relics)
-				{	
-					if (relic.state == Relic.STATE_GROUND)
-					{
-						var toRelic: Vector3D = new Vector3D(player.x - relic.x, 0, player.z - relic.z);
-						var dist: Float = toRelic.normalize();
-						if (dist < player.pickupRange && dist < nearest)
-						{
-							var dot: Float = front.dotProduct(toRelic);
-							if (dot < -0.85) 
-							{
-								nearest = dist;
-								toPickUp = relic;
-							}							
-						}
-					}
-				}	
-				if (toPickUp != null)
-				{
-					player.pickupRelic(toPickUp);
-				}
-				else
-				{
-					nearest = Math.POSITIVE_INFINITY;
-					var toPickUpFrom: Player = null;
-					for (other in game.players)
-					{
-						if (other.holding != null)
-						{
-							var playerFront: Vector3D = new Vector3D(Math.cos(Utils.toRad(other.lookAngle)), 0, Math.sin(Utils.toRad(other.lookAngle)));
-							var toPlayer: Vector3D = new Vector3D(player.x - other.x, 0, player.z - other.z);
-							var dist: Float = toPlayer.normalize();
-							if (dist < player.pickupRange && dist < nearest)
-							{
-								var dot: Float = front.dotProduct(playerFront);
-								if (dot < -0.85)
-								{
-									nearest = dist;
-									toPickUpFrom = other;
-								}
-							}
-						}
-					}
-					if (toPickUpFrom != null)
-					{
-						player.holding = toPickUpFrom.holding;
-						toPickUpFrom.holding = null;
-					}
-				}
-			}
-			else
-			{
-				player.dropRelic();
-			}
+			player.useButton(game);
 		}
 		
 		if (player.stamina >= 30.0 && Input.isPressed(gamepad + "shoot"))
@@ -129,6 +112,11 @@ class InputController implements PlayerController
 		{
 			if (Input.isDown("turn_left")) player.lookAngle -= player.lookspeed * delta * player.runMultiplier;
 			if (Input.isDown("turn_right")) player.lookAngle += player.lookspeed * delta * player.runMultiplier;					
+
+			#if desktop
+			player.lookAngle += 180 * mouseDeltaX * player.lookspeed * delta * player.runMultiplier;
+			mouseDeltaX = 0;
+			#end
 		}		
 	}
 }

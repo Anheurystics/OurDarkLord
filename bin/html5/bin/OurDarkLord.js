@@ -805,9 +805,9 @@ ApplicationMain.create = function(config) {
 	ManifestResources.init(config);
 	var _this = app.meta;
 	if(__map_reserved["build"] != null) {
-		_this.setReserved("build","45");
+		_this.setReserved("build","46");
 	} else {
-		_this.h["build"] = "45";
+		_this.h["build"] = "46";
 	}
 	var _this1 = app.meta;
 	if(__map_reserved["company"] != null) {
@@ -6145,57 +6145,7 @@ InputController.prototype = {
 			player.runMultiplier = 1.5;
 		}
 		if(Input.isPressed(this.gamepad + "use")) {
-			if(player.holding == null) {
-				var front = new openfl_geom_Vector3D(Math.cos(Utils.toRad(player.lookAngle)),0,Math.sin(Utils.toRad(player.lookAngle)));
-				var nearest = Infinity;
-				var toPickUp = null;
-				var _this = game.relics;
-				var relic = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
-				while(relic.hasNext()) {
-					var relic1 = relic.next();
-					if(relic1.state == Relic.STATE_GROUND) {
-						var toRelic = new openfl_geom_Vector3D(player.get_x() - relic1.get_x(),0,player.get_z() - relic1.get_z());
-						var dist = toRelic.normalize();
-						if(dist < player.pickupRange && dist < nearest) {
-							var dot = front.dotProduct(toRelic);
-							if(dot < -0.85) {
-								nearest = dist;
-								toPickUp = relic1;
-							}
-						}
-					}
-				}
-				if(toPickUp != null) {
-					player.pickupRelic(toPickUp);
-				} else {
-					nearest = Infinity;
-					var toPickUpFrom = null;
-					var _g = 0;
-					var _g1 = game.players;
-					while(_g < _g1.length) {
-						var other = _g1[_g];
-						++_g;
-						if(other.holding != null) {
-							var playerFront = new openfl_geom_Vector3D(Math.cos(Utils.toRad(other.lookAngle)),0,Math.sin(Utils.toRad(other.lookAngle)));
-							var toPlayer = new openfl_geom_Vector3D(player.get_x() - other.get_x(),0,player.get_z() - other.get_z());
-							var dist1 = toPlayer.normalize();
-							if(dist1 < player.pickupRange && dist1 < nearest) {
-								var dot1 = front.dotProduct(playerFront);
-								if(dot1 < -0.85) {
-									nearest = dist1;
-									toPickUpFrom = other;
-								}
-							}
-						}
-					}
-					if(toPickUpFrom != null) {
-						player.holding = toPickUpFrom.holding;
-						toPickUpFrom.holding = null;
-					}
-				}
-			} else {
-				player.dropRelic();
-			}
+			player.useButton(game);
 		}
 		if(player.stamina >= 30.0 && Input.isPressed(this.gamepad + "shoot")) {
 			player.throwRelic();
@@ -7180,6 +7130,59 @@ Player.prototype = $extend(Entity.prototype,{
 		this.sprite.x = this.get_x();
 		this.sprite.z = this.get_z();
 		this.sprite.angleOffset = this.lookAngle;
+	}
+	,useButton: function(game) {
+		if(this.holding == null) {
+			var front = new openfl_geom_Vector3D(Math.cos(Utils.toRad(this.lookAngle)),0,Math.sin(Utils.toRad(this.lookAngle)));
+			var nearest = Infinity;
+			var toPickUp = null;
+			var _this = game.relics;
+			var relic = new haxe_ds__$StringMap_StringMapIterator(_this,_this.arrayKeys());
+			while(relic.hasNext()) {
+				var relic1 = relic.next();
+				if(relic1.state == Relic.STATE_GROUND) {
+					var toRelic = new openfl_geom_Vector3D(this.get_x() - relic1.get_x(),0,this.get_z() - relic1.get_z());
+					var dist = toRelic.normalize();
+					if(dist < this.pickupRange && dist < nearest) {
+						var dot = front.dotProduct(toRelic);
+						if(dot < -0.85) {
+							nearest = dist;
+							toPickUp = relic1;
+						}
+					}
+				}
+			}
+			if(toPickUp != null) {
+				this.pickupRelic(toPickUp);
+			} else {
+				nearest = Infinity;
+				var toPickUpFrom = null;
+				var _g = 0;
+				var _g1 = game.players;
+				while(_g < _g1.length) {
+					var other = _g1[_g];
+					++_g;
+					if(other.holding != null) {
+						var playerFront = new openfl_geom_Vector3D(Math.cos(Utils.toRad(other.lookAngle)),0,Math.sin(Utils.toRad(other.lookAngle)));
+						var toPlayer = new openfl_geom_Vector3D(this.get_x() - other.get_x(),0,this.get_z() - other.get_z());
+						var dist1 = toPlayer.normalize();
+						if(dist1 < this.pickupRange && dist1 < nearest) {
+							var dot1 = front.dotProduct(playerFront);
+							if(dot1 < -0.85) {
+								nearest = dist1;
+								toPickUpFrom = other;
+							}
+						}
+					}
+				}
+				if(toPickUpFrom != null) {
+					this.holding = toPickUpFrom.holding;
+					toPickUpFrom.holding = null;
+				}
+			}
+		} else {
+			this.dropRelic();
+		}
 	}
 	,pickupRelic: function(relic) {
 		if(relic.state != Relic.STATE_GROUND) {
