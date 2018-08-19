@@ -77,7 +77,16 @@ class Game extends Sprite
 			bounds: 0
 		};
 		
-		desertMap = new MapData("desert", "graphics/skybox_sunset.png", 128, 20.0, "graphics/cobble.png", 25);
+		var desertSkyboxPath = [
+			"graphics/Nalovardo/posx.jpg",
+			"graphics/Nalovardo/negx.jpg",
+			"graphics/Nalovardo/posy.jpg",
+			"graphics/Nalovardo/negy.jpg",
+			"graphics/Nalovardo/posz.jpg",
+			"graphics/Nalovardo/negz.jpg"
+		];
+
+		desertMap = new MapData("desert", desertSkyboxPath, "graphics/cobble.png", 25);
 		gameInfo.bounds = desertMap.fieldDimension;	
 		
 		circle = new MagicCircle(0, 0, 2);
@@ -137,7 +146,7 @@ class Game extends Sprite
 		floorMatrix = new Mat4().rotate(-90, Vector3D.X_AXIS).scale(planeWidth, 1.0, planeLength).translate(0, -0.5, 0);		
 		circleMatrix = new Mat4().rotate(-90, Vector3D.X_AXIS).scale(circle.scale, 1.0, circle.scale).translate(0, -0.49, 0);
 		
-		skyboxMatrix = new Mat4().scale(desertMap.skyboxFinalSize, desertMap.skyboxFinalSize, desertMap.skyboxFinalSize);
+		skyboxMatrix = new Mat4().scale(20, 20, 20);
 		
 		Lib.current.stage.addEventListener(Event.RESIZE, resizeCallback);
 		
@@ -275,7 +284,7 @@ class Game extends Sprite
 		renderer.renderMesh(floorMatrix);
 		
 		renderer.uniformf("tile", 1, 1);
-		renderer.uploadTexture(TextureManager.get("circle_1"));
+		renderer.uploadTexture(TextureManager.get("circle_2"));
 		renderer.renderMesh(circleMatrix);
 		
 		for (p in players)
