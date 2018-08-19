@@ -1,6 +1,6 @@
 package;
 
-import lime.graphics.opengl.WebGLContext;
+import lime.graphics.WebGLRenderContext;
 import lime.graphics.opengl.GLUniformLocation;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
@@ -18,12 +18,12 @@ class Renderer
 	var nVertices: Int;
 	var nIndices: Int;
 
-	var uniformFV: Array<GLUniformLocation -> Float32Array -> Void>;
-	var uniformIV: Array<GLUniformLocation -> Int32Array -> Void>;
+	var uniformFV: Array<GLUniformLocation -> Float32Array -> Int -> Int -> Void>;
+	var uniformIV: Array<GLUniformLocation -> Int32Array -> Int -> Int -> Void>;
 
-	var gl: WebGLContext;
+	var gl: WebGLRenderContext;
 	
-	public function new(gl: WebGLContext) 
+	public function new(gl: WebGLRenderContext) 
 	{
 		this.gl = gl;
 
@@ -135,13 +135,13 @@ class Renderer
 	public function uniformfv(name: String, arr: Float32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformFV[arr.length - 1](loc, arr);
+		uniformFV[arr.length - 1](loc, arr, 0, 0);
 	}
 	
 	public function uniformiv(name: String, arr: Int32Array)
 	{
 		var loc: GLUniformLocation = program.uniform(name);
-		uniformIV[arr.length - 1](loc, arr);
+		uniformIV[arr.length - 1](loc, arr, 0, 0);
 	}
 	
 	public function uniformi(name: String, d1: Int, d2: Int = null, d3: Int = null, d4: Int = null)

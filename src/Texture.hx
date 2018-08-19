@@ -29,7 +29,7 @@ class Texture
 		#else
 		var pixels = new UInt8Array(bitmapData.getPixels(bitmapData.rect));
 		#end
-		
+
 		unit = GL.createTexture();
 		
 		var wrap: Int = GL.REPEAT;
@@ -43,7 +43,11 @@ class Texture
 		GL.bindTexture(GL.TEXTURE_2D, unit);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, wrap);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, wrap);
+		#if html5
+		GL.texImage2DWEBGL(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixels, 0);
+		#else
 		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+		#end
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, filter);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter);
 		GL.bindTexture (GL.TEXTURE_2D, null);

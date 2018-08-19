@@ -7,7 +7,7 @@ import openfl.events.Event;
 import openfl.events.RenderEvent;
 import openfl.geom.Rectangle;
 import openfl.geom.Vector3D;
-import lime.graphics.opengl.WebGLContext;
+import lime.graphics.WebGLRenderContext;
 import lime.utils.Float32Array;
 
 class Game extends Sprite 
@@ -173,7 +173,7 @@ class Game extends Sprite
 		Lib.current.stage.invalidate();
 	}
 
-	function glInit(gl: WebGLContext)
+	function glInit(gl: WebGLRenderContext)
 	{
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
@@ -199,7 +199,7 @@ class Game extends Sprite
 	var initialized: Bool = false;
 	function glRender(event: RenderEvent): Void
 	{		
-		var gl: WebGLContext = cast(cast(event.renderer, OpenGLRenderer).gl);
+		var gl: WebGLRenderContext = cast(cast(event.renderer, OpenGLRenderer).gl);
 		if(!initialized) 
 		{
 			glInit(gl);

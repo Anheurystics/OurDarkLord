@@ -1,7 +1,7 @@
 package;
 
 import openfl.Assets;
-import lime.graphics.opengl.WebGLContext;
+import lime.graphics.WebGLRenderContext;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLShader;
 import lime.graphics.opengl.GLUniformLocation;
@@ -27,9 +27,9 @@ class ShaderProgram
 	var vertName: String;
 	var fragName: String;
 
-	var gl: WebGLContext;
+	var gl: WebGLRenderContext;
 	
-	public function new(_gl: WebGLContext, _vertName: String, _fragName: String) 
+	public function new(_gl: WebGLRenderContext, _vertName: String, _fragName: String) 
 	{
 		gl = _gl;
 		vertName = _vertName;

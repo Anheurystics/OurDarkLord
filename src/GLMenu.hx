@@ -12,7 +12,7 @@ import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
-import lime.graphics.opengl.WebGLContext;
+import lime.graphics.WebGLRenderContext;
 
 typedef CamTransform = {
 	var x: Float;
@@ -93,7 +93,7 @@ class GLMenu extends Sprite
 		addEventListener(RenderEvent.RENDER_OPENGL, glRender);
 	}
 
-	function glInit(gl: WebGLContext)
+	function glInit(gl: WebGLRenderContext)
 	{
 		renderer = new Renderer(gl);
 		simpleProgram = new ShaderProgram(gl, "simple", "simple");
@@ -264,7 +264,7 @@ class GLMenu extends Sprite
 		//TODO Angular tween
 	}
 
-	function generateTextureFromText(gl: WebGLContext, text: String, format: TextFormat, texName: String)
+	function generateTextureFromText(gl: WebGLRenderContext, text: String, format: TextFormat, texName: String)
 	{
 		var field: TextField = new TextField();
 		
@@ -299,7 +299,7 @@ class GLMenu extends Sprite
 	var initialized: Bool = false;
 	function glRender(event: RenderEvent): Void
 	{		
-		var gl: WebGLContext = cast(cast(event.renderer, OpenGLRenderer).gl);
+		var gl: WebGLRenderContext = cast(cast(event.renderer, OpenGLRenderer).gl);
 		if(!initialized) 
 		{
 			glInit(gl);

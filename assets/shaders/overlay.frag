@@ -15,7 +15,7 @@ void main()
 	
 	color.a *= alpha;
 	
-	if(color.a == 0)
+	if(color.a == 0.0)
 	{
 		discard;
 	}

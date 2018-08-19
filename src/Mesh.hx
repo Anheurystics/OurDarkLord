@@ -1,6 +1,6 @@
 package;
 
-import lime.graphics.opengl.WebGLContext;
+import lime.graphics.WebGLRenderContext;
 import lime.graphics.opengl.GLBuffer;
 import lime.utils.Float32Array;
 import lime.utils.Int16Array;
@@ -18,7 +18,7 @@ class Mesh
 	
 	public var totalAttribSize: Int;
 
-	public function new(gl: WebGLContext, vertices: Array<Float>, indices: Array<Int>, attribNames: Array<String>, attribSizes: Array<Int>) 
+	public function new(gl: WebGLRenderContext, vertices: Array<Float>, indices: Array<Int>, attribNames: Array<String>, attribSizes: Array<Int>) 
 	{		
 		nVertices = vertices.length;
 		nIndices = indices.length;

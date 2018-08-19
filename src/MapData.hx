@@ -55,7 +55,11 @@ class MapData
 		
 		for(i in 0...6)
 		{
+			#if html5
+			GL.texImage2DWEBGL(GL.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, skyboxTextures[i].image.data, 0);
+			#else
 			GL.texImage2D(GL.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL.RGBA, d, d, 0, GL.RGBA, GL.UNSIGNED_BYTE, skyboxTextures[i].image.data);
+			#end	
 		}
 		
 		GL.texParameteri(GL.TEXTURE_CUBE_MAP, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
