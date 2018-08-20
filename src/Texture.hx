@@ -55,11 +55,7 @@ class Texture
 	
 	function isPowerOfTwo(n: Int): Bool
 	{
-		while (n & 1 == 0 && n != 1)
-		{
-			n = n >> 1;
-		}
-		return n == 1;
+		return (n & (n - 1)) == 0 || n == 0;
 	}
 	
 	public function bind(slot: Int): Void

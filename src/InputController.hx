@@ -30,7 +30,6 @@ class InputController implements PlayerController
 			});
 
 			window.onMouseDown.add(function(x, y, btn) {
-				trace(btn);
 				if(_player != null && _game != null)
 				{
 					if(btn == 0) 
