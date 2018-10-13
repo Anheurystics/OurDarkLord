@@ -1,0 +1,5 @@
+{
+    "haxe.displayConfigurations": [
+        ["bin\\windows\\haxe\\debug.hxml"]
+    ]
+}
