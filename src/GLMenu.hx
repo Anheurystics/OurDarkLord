@@ -470,7 +470,7 @@ class GLMenu extends Sprite
 		
 		cam.update();
 		
-		renderer.depthTest(gl.LEQUAL);
+		// renderer.depthTest(gl.LEQUAL);
 		renderer.blend(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		renderer.clear(0.1, 0.1, 0.1);
 		
