@@ -6,7 +6,7 @@
 	<app main="Main" file="OurDarkLord" path="bin" />
 	
 	<window background="#000000" fps="60" />
-	<window width="640" height="480" unless="mobile" />
+	<window width="640" height="400" unless="mobile" />
 	<window orientation="landscape" vsync="false" antialiasing="4" />
 	
 	<set name="webgl" if="html5" />
